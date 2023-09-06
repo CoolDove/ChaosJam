@@ -1,5 +1,6 @@
 package main
 
+import "core:fmt"
 import "core:log"
 import "core:strings"
 import rl "vendor:raylib"
@@ -12,7 +13,7 @@ TalkContext :: struct {
     show : f32,// [0,1]
 
     // visual things.
-    tween : TweenRef,
+    // tween : TweenRef,
 }
 
 current_talk : TalkContext
@@ -70,6 +71,7 @@ tk_push :: proc(content: string) {
 
 talk_resp_eat_good :: proc() {
     tk_clear()
+    tk_push(fmt.tprintf("茧吃掉了你的\n\"{}\"。", strings.to_string(last_eat.path)))
     tk_push("茧缩紧了身体，\n发出一阵剧烈的颤抖，\n随后平静了下来。")
     tk_push("它说道：食物我喜欢，想要更多exe")
     tk_push("Good night")

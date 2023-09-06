@@ -8,13 +8,10 @@ import "core:runtime"
 import "core:strings"
 import rl "vendor:raylib"
 
-
-
 Game :: struct {
     tweener : Tweener,
     state : GameState,
 }
-
 
 GameState :: enum {
     Talk,
@@ -27,11 +24,14 @@ game_begin :: proc() {
     tweener_init(&game.tweener, 10)
     load_resources()
 
+    strings.builder_init(&last_eat.path)
+
     _talk_init()
 
 }
 
 game_end :: proc() {
+    strings.builder_destroy(&last_eat.path)
     _talk_destroy()
     tweener_release(&game.tweener)
 }
@@ -70,8 +70,16 @@ EatResult :: enum {
     Plain, Good, Bad,
 }
 
+EatRecord :: struct {
+    path : strings.Builder,
+}
+
+last_eat : EatRecord
+
 eat :: proc(path: string) -> EatResult {
     if file, ok := os.read_entire_file(path); ok {
+        strings.builder_reset(&last_eat.path)
+        strings.write_string(&last_eat.path, path)
         log.debugf("I ate: {}.", path)
         os.remove(path)
         return .Good
