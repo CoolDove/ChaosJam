@@ -60,7 +60,6 @@ main :: proc() {
         delta := _time_step()
         app_info.width, app_info.height = rl.GetScreenWidth(), rl.GetScreenHeight()
         
-        
         rl.BeginDrawing()
         gl.Enable(gl.BLEND)
         rl.ClearBackground({0,0,0,0})
@@ -117,9 +116,6 @@ set_window_mode :: proc(mode: WindowMode) {
     }
 }
 
-
-
-
 get_font_size :: #force_inline proc() -> i32 {
-    return 20
+    return 45
 }

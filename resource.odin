@@ -1,19 +1,39 @@
 package main
 
 
+import "core:unicode/utf8"
 import rl "vendor:raylib"
 
 
+// -- Raw
+RAW_TTF_SMILEY :: #load("./res/smiley.ttf", []u8)
 RAW_PNG_JAM_IDLE :: #load("./res/jam_idle.png", []u8)
 
 
-
+// -- In game
 TEX_JAM_IDLE : rl.Texture2D
-
+FONT_DEFAULT : rl.Font
 
 
 load_resources :: proc() {
     TEX_JAM_IDLE = _load_texture(RAW_PNG_JAM_IDLE)
+
+    runes := utf8.string_to_runes(_char_sheet)
+    defer delete(runes)
+
+    FONT_DEFAULT = rl.LoadFontFromMemory(
+        ".ttf", 
+        raw_data(RAW_TTF_SMILEY), 
+        cast(i32)len(RAW_TTF_SMILEY), 
+        30, 
+        &runes[0], 
+        cast(i32)len(runes))
+
+}
+
+release_resources :: proc() {
+    rl.UnloadTexture(TEX_JAM_IDLE)
+    rl.UnloadFont(FONT_DEFAULT)
 
 }
 
@@ -25,21 +45,4 @@ _load_texture :: proc(data: []u8) -> rl.Texture2D {
     return rl.LoadTextureFromImage(img)
 }
 
-
-
-// talks
-TALK_BEGIN :: proc() -> []string {
-    talk :: []string {
-        "你的电脑里出现了一只丑陋的茧......",
-        "他的口状器官微微翕动，露出一圈锋利的牙齿，从中发出微弱的声音：\nV我50",
-    }
-    return talk
-}
-
-TALK_RESP_NICE :: proc() -> []string {
-    talk :: []string {
-        "茧缩紧了身体，发出一阵剧烈的颤抖，随后平静了下来。",
-        "它说道：食物我喜欢，想要更多exe",
-    }
-    return talk
-}
+_char_sheet := #load("./char_sheet.txt", string)

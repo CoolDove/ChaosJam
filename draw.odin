@@ -12,7 +12,13 @@ draw :: proc() {
         defer delete(cline)
         width := rl.MeasureText(cline, get_font_size())
 
-        rl.DrawText(cline, app_info.width/2 - width/2, 600, get_font_size(), rl.RED)
+        rl.DrawTextEx(
+            FONT_DEFAULT, 
+            cline, 
+            vec_i2f(Vector2i{ app_info.width/2 - width/2, 600 }), 
+            auto_cast get_font_size(),
+            1.0,
+            rl.RED)
     }
 
     if game.state == .WaitForDrop {
