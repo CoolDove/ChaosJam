@@ -32,6 +32,13 @@ AppTimer :: struct {
     delta : time.Duration,
 }
 app_timer : AppTimer
+AppInfo :: struct {
+    width, height : i32,
+    frame_ms : f64,
+}
+app_info : AppInfo
+
+
 
 main :: proc() {
     context.logger = log.create_console_logger()
@@ -50,24 +57,17 @@ main :: proc() {
     game_begin()
 
     for (!rl.WindowShouldClose()) {
-
-        old_time := app_timer.game_time
-        app_timer.game_time = time.stopwatch_duration(stopwatch)
-        delta := app_timer.game_time - old_time
-        app_timer.delta = delta
+        delta := _time_step()
+        app_info.width, app_info.height = rl.GetScreenWidth(), rl.GetScreenHeight()
         
         
         rl.BeginDrawing()
         gl.Enable(gl.BLEND)
         rl.ClearBackground({0,0,0,0})
 
-        game_update(cast(f32)time.duration_seconds(delta))
+        game_update(delta)
         
-
-        rl.DrawTexture(TEX_JAM_IDLE, 30, 30, rl.WHITE)
-
-
-        rl.DrawText("Hello, world", 300, 400, 40, rl.WHITE)
+        draw()
 
         if rl.IsKeyPressed(.K) {
             toggle_window_mode()
@@ -78,6 +78,14 @@ main :: proc() {
     game_end()
 }
 
+
+_time_step :: proc() -> f32 {
+    old_time := app_timer.game_time
+    app_timer.game_time = time.stopwatch_duration(stopwatch)
+    delta := app_timer.game_time - old_time
+    app_timer.delta = delta
+    return cast(f32)time.duration_seconds(delta)
+}
 
 toggle_window_mode :: proc() {
     if window_mode == .Default {
@@ -107,4 +115,11 @@ set_window_mode :: proc(mode: WindowMode) {
 
         window_mode = mode
     }
+}
+
+
+
+
+get_font_size :: #force_inline proc() -> i32 {
+    return 20
 }
