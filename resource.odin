@@ -25,7 +25,7 @@ load_resources :: proc() {
         ".ttf", 
         raw_data(RAW_TTF_SMILEY), 
         cast(i32)len(RAW_TTF_SMILEY), 
-        30, 
+        get_font_size(), 
         &runes[0], 
         cast(i32)len(runes))
 
@@ -34,9 +34,7 @@ load_resources :: proc() {
 release_resources :: proc() {
     rl.UnloadTexture(TEX_JAM_IDLE)
     rl.UnloadFont(FONT_DEFAULT)
-
 }
-
 
 @(private="file")
 _load_texture :: proc(data: []u8) -> rl.Texture2D {

@@ -9,6 +9,7 @@ TalkContext :: struct {
     lines : strings.Builder,
     slice : [dynamic]i32,
     idx : i32,
+    show : f32,// [0,1]
 
     // visual things.
     tween : TweenRef,
@@ -17,17 +18,25 @@ TalkContext :: struct {
 current_talk : TalkContext
 
 // return : finish
-_talk_begin :: proc() {
+_talk_init :: proc() {
     strings.builder_init(&current_talk.lines)
     current_talk.slice = make([dynamic]i32)
+}
+_talk_begin :: proc() {
+    game.state = .Talk
+    current_talk.show = 0.0
+    tween(&game.tweener, &current_talk.show, 1.0, 0.2)
 }
 _talk_update :: proc(delta: f32) -> bool {
     if rl.IsKeyPressed(.ENTER) || rl.IsMouseButtonPressed(.LEFT) {
         current_talk.idx += 1
+        current_talk.show = 0.0
+        tween(&game.tweener, &current_talk.show, 1.0, 0.2)
     }
+
     return current_talk.idx >= tk_count()
 }
-_talk_end :: proc() {
+_talk_destroy :: proc() {
     strings.builder_destroy(&current_talk.lines)
     delete(current_talk.slice)
 }
@@ -61,31 +70,26 @@ tk_push :: proc(content: string) {
 
 talk_resp_eat_good :: proc() {
     tk_clear()
-    tk_push("Hello, 1")
-    tk_push("你好")
+    tk_push("茧缩紧了身体，\n发出一阵剧烈的颤抖，\n随后平静了下来。")
+    tk_push("它说道：食物我喜欢，想要更多exe")
     tk_push("Good night")
+    tk_push("Good dd")
+    _talk_begin()
 }
 
 talk_resp_eat_bad :: proc() {
     tk_clear()
     tk_push("I ate bad")
     tk_push("bye")
+    _talk_begin()
 }
 
 
 // talks
-TALK_BEGIN :: proc() -> []string {
-    talk :: []string {
-        "你的电脑里出现了一只丑陋的茧......",
-        "他的口状器官微微翕动，露出一圈锋利的牙齿，从中发出微弱的声音：\nV我50",
-    }
-    return talk
-}
-
-TALK_RESP_NICE :: proc() -> []string {
-    talk :: []string {
-        "茧缩紧了身体，发出一阵剧烈的颤抖，随后平静了下来。",
-        "它说道：食物我喜欢，想要更多exe",
-    }
-    return talk
-}
+// TALK_BEGIN :: proc() -> []string {
+//     talk :: []string {
+//         "你的电脑里出现了一只丑陋的茧......",
+//         "他的口状器官微微翕动，露出一圈锋利的牙齿，从中发出微弱的声音：\nV我50",
+//     }
+//     return talk
+// }

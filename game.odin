@@ -27,12 +27,12 @@ game_begin :: proc() {
     tweener_init(&game.tweener, 10)
     load_resources()
 
-    _talk_begin()
+    _talk_init()
 
 }
 
 game_end :: proc() {
-    _talk_end()
+    _talk_destroy()
     tweener_release(&game.tweener)
 }
 
@@ -44,10 +44,6 @@ game_update :: proc(delta: f32) {
         if _talk_update(delta) {
             game.state = .WaitForDrop
         }
-        // if talker(delta, .Update) {
-        //     talker(0, .Exit)
-        //     game.state = .WaitForDrop
-        // }
     case .WaitForDrop:
         if rl.IsFileDropped() {
             filepath_list := rl.LoadDroppedFiles()
@@ -57,13 +53,10 @@ game_update :: proc(delta: f32) {
 
             if result == .Good {
                 talk_resp_eat_good()
-                game.state = .Talk
             } else {
                 talk_resp_eat_bad()
-                game.state = .Talk
             }
         }
-
 
         // debug
         if rl.IsMouseButtonPressed(.RIGHT) {

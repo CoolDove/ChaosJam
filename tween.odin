@@ -44,7 +44,7 @@ tweener_update :: proc(tweener: ^Tweener, delta: f32) {
     for &tween, idx in tweener.tweens {
         if tween.id <= 0 do continue
         tween.time += delta
-        interp := tween.time
+        interp := tween.time/tween.duration
         if interp >= 1.0 {
             tween_set_data(tween.data, tween.end_value)
             if tween.on_complete != nil do tween.on_complete(tween.user_data)
@@ -102,7 +102,6 @@ tween :: proc(tweener: ^Tweener, value: ^$T, target : T, duration : f32) -> ^Twe
     assert(tween_type_is_valid(ptr_type), 
         "Invalid tween invoke.")
 
-    reuse := false
     tween :^Tween
     if len(tweener.dead) > 0 {
         reuse_idx := pop(&tweener.dead)
@@ -121,6 +120,7 @@ tween :: proc(tweener: ^Tweener, value: ^$T, target : T, duration : f32) -> ^Twe
     tween.begin_value = value^
     tween.end_value = cast(TweenableValue)target
     tween.duration = duration
+    tween.time = 0
     return tween
 }
 

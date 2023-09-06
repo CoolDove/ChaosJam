@@ -43,16 +43,21 @@ app_info : AppInfo
 main :: proc() {
     context.logger = log.create_console_logger()
 
-    rl.SetWindowState({ 
-        rl.ConfigFlag.WINDOW_MAXIMIZED,
-        // .WINDOW_UNDECORATED,
-    })
     rl.InitWindow(800, 800, "霸王之茧");
 
+    rl.SetWindowState({ 
+        .WINDOW_MAXIMIZED,
+        .VSYNC_HINT,
+        // .WINDOW_UNDECORATED,
+    })
     gl.load_up_to(3,3,win32.gl_set_proc_address)
 
     rl.SetExitKey(rl.KeyboardKey.KEY_NULL)
 
+    app_timer.game_begin = time.now()
+    time.stopwatch_start(&stopwatch)
+
+    tween_system_init()
 
     game_begin()
 
