@@ -9,6 +9,11 @@ import "core:strings"
 import rl "vendor:raylib"
 
 
+when ODIN_DEBUG {
+INIT_CHEAT_MODE :: true
+} else {
+INIT_CHEAT_MODE :: false
+}
 
 cheat_mode : bool = true
 
@@ -25,6 +30,8 @@ GameState :: enum {
 game : Game
 
 game_begin :: proc() {
+    cheat_mode = INIT_CHEAT_MODE
+    
     tweener_init(&game.tweener, 10)
     load_resources()
 
