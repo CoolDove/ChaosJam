@@ -3,6 +3,7 @@ package main
 import "core:time"
 import "core:math"
 import "core:log"
+import "core:fmt"
 import "core:strings"
 import rl "vendor:raylib"
 
@@ -25,13 +26,12 @@ draw :: proc() {
         alpha := math.abs(math.sin(2.0 * t))
         alpha = alpha * 0.8+0.2
         color :rl.Color= {188, 188, 188, auto_cast (255.0 * alpha )}
-        draw_text_center("Please drop a file.", 400, color)
+        draw_text_center("Please drop a file.", 500, color)
     }
 
     if cheat_mode {
-        draw_text("CHEATMODE", {10, 10}, rl.GREEN)
-        // rl.DrawTextEx(
-        // )
+        cheat_msg := fmt.ctprintf("CHEATMODE: {}", strings.to_string(game.target_file))
+        draw_text(cheat_msg, {10, 10}, rl.GREEN)
     }
     
 }

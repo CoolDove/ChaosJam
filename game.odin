@@ -20,6 +20,8 @@ cheat_mode : bool = true
 Game :: struct {
     tweener : Tweener,
     state : GameState,
+
+    target_file : strings.Builder,
 }
 
 GameState :: enum {
@@ -36,6 +38,9 @@ game_begin :: proc() {
     load_resources()
 
     strings.builder_init(&last_eat.path)
+    strings.builder_init(&game.target_file)
+
+    find_target_file(&game.target_file)
 
     _talk_init()
 
@@ -44,6 +49,7 @@ game_begin :: proc() {
 }
 
 game_end :: proc() {
+    strings.builder_destroy(&game.target_file)
     strings.builder_destroy(&last_eat.path)
     _talk_destroy()
     tweener_release(&game.tweener)
