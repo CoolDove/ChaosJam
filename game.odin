@@ -154,6 +154,8 @@ cheat_mode_update :: proc() {
     case 2:
         if IsKeyPressed(.S) {
             cheat_mode_state = 3            
+        } else if IsKeyPressed(.K) {
+            cheat_mode_state = 2
         } else if GetKeyPressed() != .KEY_NULL {
             cheat_mode_state = 0
         }
