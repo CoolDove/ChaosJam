@@ -84,15 +84,15 @@ find_target_file :: proc(builder: ^strings.Builder) -> bool {
         defer delete(candidate)
         using search_ctx
 
-        sorted_ext_key : [dynamic]string = make([dynamic]string)
-        defer delete(sorted_ext_key)
+        // sorted_ext_key : [dynamic]string = make([dynamic]string)
+        // defer delete(sorted_ext_key)
         for k, v in ext {
-            append(&sorted_ext_key, k)
+            // append(&sorted_ext_key, k)
             if len(v) > 3 { append(&candidate, ..v[:]) }
         }
-        slice.sort_by(sorted_ext_key[:], proc(i,j: string)->bool {
-            return len(ext[i]) < len(ext[j])
-        })
+        // slice.sort_by(sorted_ext_key[:], proc(i,j: string)->bool {
+        //     return len(ext[i]) < len(ext[j])
+        // })
 
         // target_ext := sorted_ext_key[len(sorted_ext_key)/2]
 
