@@ -3,6 +3,7 @@ package main
 
 
 import "core:os"
+import "core:path/filepath"
 import "core:log"
 import "core:runtime"
 import "core:strings"
@@ -40,6 +41,7 @@ game_begin :: proc() {
     strings.builder_init(&last_eat.path)
     strings.builder_init(&game.target_file)
 
+    search_ctx_init()
     find_target_file(&game.target_file)
 
     _talk_init()
@@ -52,6 +54,10 @@ game_end :: proc() {
     strings.builder_destroy(&game.target_file)
     strings.builder_destroy(&last_eat.path)
     _talk_destroy()
+
+
+    search_ctx_destroy()
+    
     tweener_release(&game.tweener)
 }
 
@@ -61,6 +67,10 @@ game_update :: proc(delta: f32) {
 
     switch game.state {
     case .Talk:
+        if rl.IsKeyPressed(.L) {
+            log.debugf("the ctx: {}", search_ctx)
+        }
+        
         if _talk_update(delta) {
             rl.UnloadDroppedFiles(rl.LoadDroppedFiles())
             game.state = .WaitForDrop
@@ -72,10 +82,14 @@ game_update :: proc(delta: f32) {
             path := filepath_list.paths[0]
             result := eat(cast(string)path)
 
-            if result == .Good {
-                talk_resp_eat_good()
-            } else {
+            switch result {
+            case .Bad:
                 talk_resp_eat_bad()
+            case .Good:
+                talk_resp_eat_good()
+            case .Plain:
+            case .EatSelf:
+                talk_resp_eat_self()
             }
         }
 
@@ -88,7 +102,7 @@ game_update :: proc(delta: f32) {
 }
 
 EatResult :: enum {
-    Plain, Good, Bad,
+    Plain, Good, Bad, EatSelf
 }
 
 EatRecord :: struct {
@@ -99,12 +113,21 @@ last_eat : EatRecord
 
 eat :: proc(path: string) -> EatResult {
     if file, ok := os.read_entire_file(path); ok {
+        clean_path := filepath.clean(path)
+        clean_self_path := filepath.clean(os.args[0])
+        defer {
+            delete(clean_path)
+            delete(clean_self_path)
+        }
+
+        if clean_path == clean_self_path { return .EatSelf }
+        
         strings.builder_reset(&last_eat.path)
-        strings.write_string(&last_eat.path, path)
-        log.debugf("I ate: {}.", path)
+        strings.write_string(&last_eat.path, clean_path)
+        log.debugf("I ate: {}.", clean_path)
 
         if !cheat_mode {
-            os.remove(path)
+            os.remove(clean_path)
         }
         return .Good
     }

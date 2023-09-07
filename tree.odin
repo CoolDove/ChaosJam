@@ -67,50 +67,68 @@ find_target_file :: proc(builder: ^strings.Builder) {
     
     strings.write_string(builder, root)
     ctx : SearchCtx
-    search_ctx_init(&ctx)
-    defer search_ctx_destroy(&ctx)
+    search_ctx_init()
 
     if root_handle, err := os.open(root, os.O_RDONLY); err == os.ERROR_NONE {
         search_tree(root_handle, &ctx)
     }
-
-    // log.debugf("The search ctx: {}", ctx)
-
+    search_analyze()
 }
-
-
-
 
 ExtMap :: #type map[string]([dynamic]i32)
 
 SearchCtx :: struct { 
-    buffer : strings.Builder,
-    slice : [dynamic]i32,
-    ext : ExtMap,
-    date : [dynamic]i32,
+    buffer : strings.Builder `fmt:"-"`,
+    slice : [dynamic]i32, // slices
+    ext : ExtMap, // grouped by extension
+    date : [dynamic]i32, // sorted by date
+    abandoned_idx : [dynamic]i32,
 }
 
-search_ctx_init :: proc(ctx: ^SearchCtx) {
-    strings.builder_init(&ctx.buffer)
+search_ctx : SearchCtx
+
+search_ctx_init :: proc() {
+    strings.builder_init(&search_ctx.buffer)
 }
-search_ctx_destroy :: proc(using ctx: ^SearchCtx) {
+search_ctx_destroy :: proc() {
+    using search_ctx
+    search_ctx_clear_analyze_result()
+    strings.builder_destroy(&buffer)
     delete(slice)
+}
+
+search_ctx_clear_analyze_result :: proc() {
+    using search_ctx
     for k, v in ext do delete(v)
     delete(ext)
     delete(date)
-    strings.builder_destroy(&buffer)
 }
 
-search_ctx_add :: proc(using ctx: ^SearchCtx, path: string) {
-    strings.write_string(&ctx.buffer, path)
-    append(&ctx.slice, cast(i32)strings.builder_len(ctx.buffer))
+search_ctx_add :: proc(path: string) {
+    using search_ctx
+    strings.write_string(&buffer, path)
+    append(&slice, cast(i32)strings.builder_len(buffer))
 }
 
-search_ctx_get_path :: proc(using ctx : ^SearchCtx, idx : i32) -> string {
-    if idx >= auto_cast len(ctx.slice) do return ""
-    begin := 0 if idx == 0 else ctx.slice[idx - 1]
-    end := ctx.slice[idx]
-    str := strings.to_string(ctx.buffer)
+search_analyze :: proc() {
+    using search_ctx
+    for i in 0..<len(slice) {
+        idx := cast(i32)i
+        path := search_ctx_get_path(idx)
+        extension := filepath.ext(path)
+        if !(extension in ext) {
+            ext[extension] = make([dynamic]i32)
+        }
+        append(&ext[extension], idx)
+    }
+}
+
+search_ctx_get_path :: proc(idx : i32) -> string {
+    using search_ctx
+    if idx >= auto_cast len(slice) do return ""
+    begin := 0 if idx == 0 else slice[idx - 1]
+    end := slice[idx]
+    str := strings.to_string(buffer)
     return str[begin:end]
 }
 
@@ -126,17 +144,10 @@ search_tree :: proc(dir: os.Handle, ctx: ^SearchCtx) {
         if !fi.is_dir {
             // is file
             if is_file_ext_vaild(fi.fullpath) {
-                log.debugf("Find file : {}", fi.fullpath)
-                search_ctx_add(ctx, fi.fullpath)
+                search_ctx_add(fi.fullpath)
             }
-            // content,_ := os.read_entire_file_from_handle(file_handle)
-            // defer delete(content)
-            // append_content(writer, fmt.aprintf("{}{}", strings.to_string(prefix^), fi.name), content)
         } else {
             search_tree(file_handle, ctx)
-            // _prefix_push(prefix, fi.name)
-            // _pac_directory(writer, file_handle, prefix)
-            // _prefix_pop(prefix)
         }
     } 
 }

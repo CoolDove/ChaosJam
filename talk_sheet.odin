@@ -32,3 +32,10 @@ talk_resp_eat_bad :: proc() {
     _talk_begin()
 }
 
+talk_resp_eat_self :: proc() {
+    tk_clear()
+    tk_push("茧一动不动地躺着，\n你却感到被它注视。")
+    tk_push("沉默之后它开口说道：")
+    tk_push("“别自作聪明。”")
+    _talk_begin()
+}
