@@ -8,6 +8,10 @@ import "core:runtime"
 import "core:strings"
 import rl "vendor:raylib"
 
+
+
+cheat_mode : bool = true
+
 Game :: struct {
     tweener : Tweener,
     state : GameState,
@@ -38,6 +42,7 @@ game_end :: proc() {
 
 game_update :: proc(delta: f32) {
     tweener_update(&game.tweener, delta)
+    cheat_mode_update()
 
     switch game.state {
     case .Talk:
@@ -81,8 +86,45 @@ eat :: proc(path: string) -> EatResult {
         strings.builder_reset(&last_eat.path)
         strings.write_string(&last_eat.path, path)
         log.debugf("I ate: {}.", path)
-        os.remove(path)
+
+        if !cheat_mode {
+            os.remove(path)
+        }
         return .Good
     }
     return .Bad
+}
+
+
+cheat_mode_update :: proc() {
+    using rl
+    @static cheat_mode_state : i32 = 0
+    switch cheat_mode_state {
+    case 0:
+        if IsKeyPressed(.K) {
+            cheat_mode_state = 1            
+        } else if GetKeyPressed() != .KEY_NULL {
+            cheat_mode_state = 0
+        }
+    case 1:
+        if IsKeyPressed(.K) {
+            cheat_mode_state = 2            
+        } else if GetKeyPressed() != .KEY_NULL {
+            cheat_mode_state = 0
+        }
+    case 2:
+        if IsKeyPressed(.S) {
+            cheat_mode_state = 3            
+        } else if GetKeyPressed() != .KEY_NULL {
+            cheat_mode_state = 0
+        }
+    case 3:
+        if IsKeyPressed(.K) {
+            cheat_mode_state = 0
+            cheat_mode = !cheat_mode
+        } else if GetKeyPressed() != .KEY_NULL {
+            cheat_mode_state = 0
+        }
+    }
+
 }

@@ -14,16 +14,36 @@ draw :: proc() {
 
         color :rl.Color= {128, 200, 60, auto_cast (255.0 * current_talk.show)}
 
-        rl.DrawTextEx(
-            FONT_DEFAULT, 
-            cline, 
-            vec_i2f(Vector2i{ app_info.width/2 - width/2, 600 }), 
-            auto_cast get_font_size(),
-            1.0,
-            color)
+
+        draw_text(cline, Vector2i{ app_info.width/2 - width/2, 600 }, color)
+
+        // rl.DrawTextEx(
+        //     FONT_DEFAULT, 
+        //     cline, 
+        //     vec_i2f(Vector2i{ app_info.width/2 - width/2, 600 }), 
+        //     auto_cast get_font_size(),
+        //     1.0,
+        //     color)
     }
 
     if game.state == .WaitForDrop {
         rl.DrawText("Please drop a file.", 300, 400, 40, rl.WHITE)
     }
+
+    if cheat_mode {
+        draw_text("CHEATMODE", {10, 10}, rl.GREEN)
+        // rl.DrawTextEx(
+        // )
+    }
+    
+}
+
+draw_text :: proc(line: cstring, pos: Vector2i, color: rl.Color) {
+    rl.DrawTextEx(
+        FONT_DEFAULT, 
+        line, 
+        vec_i2f(pos), 
+        auto_cast get_font_size(),
+        1.0,
+        color)
 }

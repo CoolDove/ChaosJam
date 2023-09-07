@@ -73,9 +73,9 @@ main :: proc() {
         
         draw()
 
-        if rl.IsKeyPressed(.K) {
-            toggle_window_mode()
-        }
+        // if rl.IsKeyPressed(.K) {
+        //     toggle_window_mode()
+        // }
         
         rl.EndDrawing()
     }
