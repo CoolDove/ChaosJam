@@ -86,26 +86,14 @@ find_target_file :: proc() -> bool {
         defer delete(candidate)
         using search_ctx
 
-        // sorted_ext_key : [dynamic]string = make([dynamic]string)
-        // defer delete(sorted_ext_key)
         for k, v in ext {
-            // append(&sorted_ext_key, k)
             if len(v) > 3 { append(&candidate, ..v[:]) }
         }
-        // slice.sort_by(sorted_ext_key[:], proc(i,j: string)->bool {
-        //     return len(ext[i]) < len(ext[j])
-        // })
-
-        // target_ext := sorted_ext_key[len(sorted_ext_key)/2]
-
-        // for idx in ext[target_ext] {
         for idx, i in candidate {
             weekday := time.weekday(infos[idx].mod_time)
             if wkgroup, ok := weekday_grouped[weekday]; ok {
                 if len(wkgroup) <= 3 {
                     unordered_remove(&candidate, i)
-                    // strings.write_string(builder, path)
-                    // return true
                 }
             }
         }
@@ -211,6 +199,7 @@ search_ctx_get_path :: proc(idx : i32) -> string {
     return str[begin:end]
 }
 
+// TODO: Ignore .git
 search_tree :: proc(dir: os.Handle, ctx: ^SearchCtx) {
     stat, stat_err := os.fstat(dir)
     if stat_err != os.ERROR_NONE do return
@@ -227,11 +216,14 @@ search_tree :: proc(dir: os.Handle, ctx: ^SearchCtx) {
                     GameFileInfo {
                         mod_time = fi.modification_time,
                         size = fi.size,
-                    }
-                )
+                    })
             }
         } else {
             search_tree(file_handle, ctx)
         }
     } 
+}
+
+get_pwd :: proc() -> string {
+    return filepath.dir(os.args[0])
 }

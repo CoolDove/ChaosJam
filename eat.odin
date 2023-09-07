@@ -46,6 +46,8 @@ eat :: proc(path: string) -> EatResult {
                     log.debugf("Eat: Same weekday")
                     result = .Good
                 }
+                wkstr := weekday_string(stat.modification_time, context.temp_allocator)
+                rl.SetWindowTitle(strings.clone_to_cstring(wkstr, context.temp_allocator))
             }
         }
 

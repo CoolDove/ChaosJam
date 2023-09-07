@@ -23,11 +23,18 @@ Game :: struct {
     state : GameState,
 
     target_file : i32,// refers to a idx in the search_ctx
+
+    puzzle_arranged : bool,
+
+    fail_count : i32,
+    mercy_tipped : bool,
+    
 }
 
 GameState :: enum {
     Talk,
     WaitForDrop,
+    Puzzle,
     Finish_FailedToFindTarget,
     Finish_TargetLost,
     Finish_Succeed,
@@ -79,7 +86,11 @@ game_update :: proc(delta: f32) {
         
         if _talk_update(delta) {
             rl.UnloadDroppedFiles(rl.LoadDroppedFiles())
-            game.state = .WaitForDrop
+            if game.puzzle_arranged {
+                game.state = .Puzzle
+            } else {
+                game.state = .WaitForDrop
+            }
         }
     case .WaitForDrop:
         if rl.IsFileDropped() {
@@ -90,8 +101,14 @@ game_update :: proc(delta: f32) {
 
             switch result {
             case .Bad:
+                game.fail_count += 1 
+                if !game.mercy_tipped && game.fail_count >= 2 {
+                    game.mercy_tipped = true;
+                    arrange_puzzle()
+                }
                 talk_resp_eat_bad()
             case .Good:
+                arrange_puzzle()
                 talk_resp_eat_good()
             case .Plain:
                 talk_resp_eat_plain()
@@ -105,6 +122,10 @@ game_update :: proc(delta: f32) {
             talk_resp_eat_good()
             game.state = .Talk
         }
+    case .Puzzle:
+        puzzle_weekday()
+        game.puzzle_arranged = false
+        talk_puzzle()
     case .Finish_FailedToFindTarget:
     case .Finish_TargetLost:
     case .Finish_Succeed:
@@ -112,6 +133,10 @@ game_update :: proc(delta: f32) {
             rl.CloseWindow()
         }
     }
+}
+
+arrange_puzzle :: proc() {
+    game.puzzle_arranged = true
 }
 
 cheat_mode_update :: proc() {
@@ -147,4 +172,8 @@ cheat_mode_update :: proc() {
         }
     }
 
+}
+
+get_target_info :: proc() -> GameFileInfo {
+    return search_ctx.infos[game.target_file]
 }

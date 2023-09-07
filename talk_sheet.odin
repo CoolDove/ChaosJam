@@ -3,8 +3,6 @@ package main
 import "core:fmt"
 import "core:strings"
 
-
-
 talk_game_start :: proc() {
     tk_clear()
     tk_push("电脑里出现了一只丑陋的卵......")
@@ -19,12 +17,17 @@ talk_game_start :: proc() {
 talk_resp_chew:: proc() {
 }
 
+talk_puzzle:: proc() {
+    tk_clear()
+    tk_push("*似乎有奇怪的事情发生了*")
+    _talk_begin()
+}
+
 talk_resp_eat_good :: proc() {
     tk_clear()
     tk_push("茧缩紧了身体，\n在一阵短促的颤抖后平静了下来。")
     tk_push("“很不错，但也只是接近，”")
     tk_push("“这不是我要的东西。”")
-    tk_push("*似乎有奇怪的事情发生了*")
     _talk_begin()
 }
 
