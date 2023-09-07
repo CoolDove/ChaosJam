@@ -32,6 +32,8 @@ game_begin :: proc() {
 
     _talk_init()
 
+    talk_game_start()
+
 }
 
 game_end :: proc() {
@@ -47,6 +49,7 @@ game_update :: proc(delta: f32) {
     switch game.state {
     case .Talk:
         if _talk_update(delta) {
+            rl.UnloadDroppedFiles(rl.LoadDroppedFiles())
             game.state = .WaitForDrop
         }
     case .WaitForDrop:
@@ -64,7 +67,7 @@ game_update :: proc(delta: f32) {
         }
 
         // debug
-        if rl.IsMouseButtonPressed(.RIGHT) {
+        if cheat_mode && rl.IsMouseButtonPressed(.RIGHT) {
             talk_resp_eat_good()
             game.state = .Talk
         }

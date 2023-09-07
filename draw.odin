@@ -1,5 +1,6 @@
 package main
 
+import "core:log"
 import "core:strings"
 import rl "vendor:raylib"
 
@@ -14,16 +15,7 @@ draw :: proc() {
 
         color :rl.Color= {128, 200, 60, auto_cast (255.0 * current_talk.show)}
 
-
         draw_text(cline, Vector2i{ app_info.width/2 - width/2, 600 }, color)
-
-        // rl.DrawTextEx(
-        //     FONT_DEFAULT, 
-        //     cline, 
-        //     vec_i2f(Vector2i{ app_info.width/2 - width/2, 600 }), 
-        //     auto_cast get_font_size(),
-        //     1.0,
-        //     color)
     }
 
     if game.state == .WaitForDrop {
