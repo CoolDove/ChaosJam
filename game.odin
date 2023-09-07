@@ -97,30 +97,30 @@ game_update :: proc(delta: f32) {
             filepath_list := rl.LoadDroppedFiles()
             defer rl.UnloadDroppedFiles(filepath_list)
             path := filepath_list.paths[0]
-            result := eat(cast(string)path)
-
-            switch result {
-            case .Bad:
-                game.fail_count += 1 
-                if !game.mercy_tipped && game.fail_count >= 2 {
-                    game.mercy_tipped = true;
+            if os.is_file(cast(string)path) {
+                result := eat(cast(string)path)
+                switch result {
+                case .Bad:
+                    game.fail_count += 1 
+                    if !game.mercy_tipped && game.fail_count >= 2 {
+                        game.mercy_tipped = true;
+                        arrange_puzzle()
+                    }
+                    talk_resp_eat_bad()
+                case .Good:
                     arrange_puzzle()
+                    talk_resp_eat_good()
+                case .Plain:
+                    talk_resp_eat_plain()
+                case .EatSelf:
+                    talk_resp_eat_self()
                 }
-                talk_resp_eat_bad()
-            case .Good:
-                arrange_puzzle()
-                talk_resp_eat_good()
-            case .Plain:
-                talk_resp_eat_plain()
-            case .EatSelf:
-                talk_resp_eat_self()
             }
         }
 
         // debug
         if cheat_mode && rl.IsMouseButtonPressed(.RIGHT) {
             talk_resp_eat_good()
-            game.state = .Talk
         }
     case .Puzzle:
         puzzle_weekday()

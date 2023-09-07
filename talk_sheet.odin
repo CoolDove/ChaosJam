@@ -26,8 +26,7 @@ talk_puzzle:: proc() {
 talk_resp_eat_good :: proc() {
     tk_clear()
     tk_push("茧缩紧了身体，\n在一阵短促的颤抖后平静了下来。")
-    tk_push("“很不错，但也只是接近，”")
-    tk_push("“这不是我要的东西。”")
+    tk_push("“很接近了，继续寻找吧。”")
     _talk_begin()
 }
 
@@ -41,7 +40,7 @@ talk_resp_eat_bad :: proc() {
 talk_resp_eat_plain :: proc() {
     tk_clear()
     tk_push("茧接受了你的供奉，")
-    tk_push("它静静的咀嚼。")
+    tk_push("它静静的蠕动，像在咀嚼一样。")
     tk_push("它吐出几个字：")
     tk_push("“这不是我要的东西，相差甚远。”")
     _talk_begin()

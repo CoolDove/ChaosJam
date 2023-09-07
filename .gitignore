@@ -6,3 +6,6 @@
 .vscode/
 .linecount/
 ols.json
+
+
+*.secret
