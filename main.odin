@@ -43,7 +43,7 @@ app_info : AppInfo
 main :: proc() {
     context.logger = log.create_console_logger()
 
-    rl.InitWindow(800, 800, "霸王之茧");
+    rl.InitWindow(800, 600, "霸王之茧");
 
     rl.SetWindowState({ 
         .WINDOW_MAXIMIZED,
