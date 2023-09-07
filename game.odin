@@ -63,13 +63,10 @@ game_begin :: proc() {
 }
 
 game_end :: proc() {
-
     strings.builder_destroy(&last_eat.path)
     _talk_destroy()
 
-
     search_ctx_destroy()
-    
     tweener_release(&game.tweener)
 }
 

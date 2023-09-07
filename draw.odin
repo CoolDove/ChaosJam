@@ -10,7 +10,8 @@ import "core:strings"
 import rl "vendor:raylib"
 
 draw :: proc() {
-    rl.DrawTexture(TEX_JAM_IDLE, 30, 30, rl.WHITE)
+    rl.DrawTexture(TEX_JAM_IDLE, 0, 0, rl.WHITE)
+    rl.DrawTexture(TEX_SUBTITLE_MASK, 0, 0, rl.WHITE)
 
     line := tk_current_line()
     if line != "" {
@@ -19,7 +20,7 @@ draw :: proc() {
         color :rl.Color= {128, 200, 60, auto_cast (255.0 * current_talk.show)}
 
         width := rl.MeasureText(cline, get_font_size())
-        draw_text(cline, Vector2i{ app_info.width/2 - width/2, 400 }, color)
+        draw_text(cline, Vector2i{ app_info.width/2 - width/2, 460 }, color)
     }
 
     if game.state == .WaitForDrop {
