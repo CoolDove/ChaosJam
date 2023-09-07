@@ -5,6 +5,7 @@ import "core:log"
 import "core:mem"
 import "core:sort"
 import "core:slice"
+import "core:math"
 import "core:math/rand"
 import "core:runtime"
 import "core:bytes"
@@ -87,23 +88,34 @@ find_target_file :: proc(builder: ^strings.Builder) -> bool {
         defer delete(sorted_ext_key)
         for k, v in ext {
             append(&sorted_ext_key, k)
+            if len(v) > 3 { append(&candidate, ..v[:]) }
         }
         slice.sort_by(sorted_ext_key[:], proc(i,j: string)->bool {
             return len(ext[i]) < len(ext[j])
         })
 
-        target_ext := sorted_ext_key[len(sorted_ext_key)/2]
+        // target_ext := sorted_ext_key[len(sorted_ext_key)/2]
 
-        for idx in ext[target_ext] {
-            path := search_ctx_get_path(idx)
+        // for idx in ext[target_ext] {
+        for idx, i in candidate {
             weekday := time.weekday(infos[idx].mod_time)
             if wkgroup, ok := weekday_grouped[weekday]; ok {
-                if len(wkgroup) > 3 {
-                    strings.write_string(builder, path)
-                    return true
+                if len(wkgroup) <= 3 {
+                    unordered_remove(&candidate, i)
+                    // strings.write_string(builder, path)
+                    // return true
                 }
             }
         }
+
+        if len(candidate) < 1 do return false
+
+        log.debugf("Candidates: {}", len(candidate))
+        r := rand.float32() * 0.99
+
+        target := candidate[cast(int) (cast(f32)len(candidate) * r)]
+        strings.write_string(builder, search_ctx_get_path(target))
+        return true
     }
 
     return false
@@ -115,9 +127,9 @@ WeekdayMap :: #type map[time.Weekday]([dynamic]i32)
 SearchCtx :: struct { 
     buffer : strings.Builder `fmt:"-"`,
 
-    infos : [dynamic]GameFileInfo,
+    infos : [dynamic]GameFileInfo `fmt:"-"`,
     
-    fragments : [dynamic]i32, // fragmentss
+    fragments : [dynamic]i32 `fmt:"-"`, // fragmentss
     
     ext : ExtMap, // grouped by extension
 

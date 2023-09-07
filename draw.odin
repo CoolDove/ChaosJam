@@ -16,10 +16,9 @@ draw :: proc() {
     if line != "" {
         cline := strings.clone_to_cstring(line)
         defer delete(cline)
-        width := rl.MeasureText(cline, get_font_size())
-
         color :rl.Color= {128, 200, 60, auto_cast (255.0 * current_talk.show)}
 
+        width := rl.MeasureText(cline, get_font_size())
         draw_text(cline, Vector2i{ app_info.width/2 - width/2, 400 }, color)
     }
 
@@ -36,8 +35,8 @@ draw :: proc() {
 
 
     if cheat_mode {
-        cheat_msg := fmt.ctprintf("CHEATMODE: {}", strings.to_string(game.target_file))
-        draw_text(cheat_msg, {10, 10}, rl.GREEN)
+        cheat_msg := fmt.ctprintf("CHEATMODE\n-{}", strings.to_string(game.target_file))
+        draw_text(cheat_msg, {10, 10}, rl.GREEN, font_size=26)
     }
     
 }
