@@ -15,20 +15,32 @@ talk_game_start :: proc() {
     _talk_begin()
 }
 
+
+talk_resp_chew:: proc() {
+}
+
 talk_resp_eat_good :: proc() {
     tk_clear()
-    tk_push(fmt.tprintf("茧吃掉了你的\n\"{}\"。", strings.to_string(last_eat.path)))
-    tk_push("茧缩紧了身体，\n发出一阵剧烈的颤抖，\n随后平静了下来。")
-    tk_push("它说道：食物我喜欢，想要更多exe")
-    tk_push("Good night")
-    tk_push("Good dd")
+    tk_push("茧缩紧了身体，\n在一阵短促的颤抖后平静了下来。")
+    tk_push("“很不错，但也只是接近，”")
+    tk_push("“这不是我要的东西。”")
+    tk_push("*似乎有奇怪的事情发生了*")
     _talk_begin()
 }
 
 talk_resp_eat_bad :: proc() {
     tk_clear()
-    tk_push("I ate bad")
-    tk_push("bye")
+    tk_push("茧扭曲着发出尖厉的咆哮：")
+    tk_push("“不要企图糊弄我，这些东西太新了。”")
+    _talk_begin()
+}
+
+talk_resp_eat_plain :: proc() {
+    tk_clear()
+    tk_push("茧接受了你的供奉，")
+    tk_push("它静静的咀嚼。")
+    tk_push("它吐出几个字：")
+    tk_push("“这不是我要的东西，相差甚远。”")
     _talk_begin()
 }
 

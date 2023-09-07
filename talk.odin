@@ -68,12 +68,3 @@ tk_push :: proc(content: string) {
     write_string(&lines, content)
     append(&slice, cast(i32)builder_len(lines))
 }
-
-// talks
-// TALK_BEGIN :: proc() -> []string {
-//     talk :: []string {
-//         "你的电脑里出现了一只丑陋的茧......",
-//         "他的口状器官微微翕动，露出一圈锋利的牙齿，从中发出微弱的声音：\nV我50",
-//     }
-//     return talk
-// }

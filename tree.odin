@@ -65,7 +65,7 @@ is_file_ext_vaild :: proc(file: string) -> bool {
 }
 
 
-find_target_file :: proc(builder: ^strings.Builder) -> bool {
+find_target_file :: proc() -> bool {
     pwd := os.args[0]
 
     root := filepath.dir(pwd)
@@ -116,7 +116,8 @@ find_target_file :: proc(builder: ^strings.Builder) -> bool {
         r := rand.float32() * 0.99
 
         target := candidate[cast(int) (cast(f32)len(candidate) * r)]
-        strings.write_string(builder, search_ctx_get_path(target))
+
+        game.target_file = target
         return true
     }
 

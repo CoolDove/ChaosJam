@@ -22,7 +22,7 @@ Game :: struct {
     tweener : Tweener,
     state : GameState,
 
-    target_file : strings.Builder,
+    target_file : i32,// refers to a idx in the search_ctx
 }
 
 GameState :: enum {
@@ -42,11 +42,11 @@ game_begin :: proc() {
     load_resources()
 
     strings.builder_init(&last_eat.path)
-    strings.builder_init(&game.target_file)
+
 
     search_ctx_init()
 
-    if find_target_file(&game.target_file) {
+    if find_target_file() {
         _talk_init()
         talk_game_start()
     } else {
@@ -56,7 +56,7 @@ game_begin :: proc() {
 }
 
 game_end :: proc() {
-    strings.builder_destroy(&game.target_file)
+
     strings.builder_destroy(&last_eat.path)
     _talk_destroy()
 
@@ -94,6 +94,7 @@ game_update :: proc(delta: f32) {
             case .Good:
                 talk_resp_eat_good()
             case .Plain:
+                talk_resp_eat_plain()
             case .EatSelf:
                 talk_resp_eat_self()
             }
@@ -112,40 +113,6 @@ game_update :: proc(delta: f32) {
         }
     }
 }
-
-EatResult :: enum {
-    Plain, Good, Bad, EatSelf
-}
-
-EatRecord :: struct {
-    path : strings.Builder,
-}
-
-last_eat : EatRecord
-
-eat :: proc(path: string) -> EatResult {
-    if file, ok := os.read_entire_file(path); ok {
-        clean_path := filepath.clean(path)
-        clean_self_path := filepath.clean(os.args[0])
-        defer {
-            delete(clean_path)
-            delete(clean_self_path)
-        }
-
-        if clean_path == clean_self_path { return .EatSelf }
-        
-        strings.builder_reset(&last_eat.path)
-        strings.write_string(&last_eat.path, clean_path)
-        log.debugf("I ate: {}.", clean_path)
-
-        if !cheat_mode {
-            os.remove(clean_path)
-        }
-        return .Good
-    }
-    return .Bad
-}
-
 
 cheat_mode_update :: proc() {
     using rl

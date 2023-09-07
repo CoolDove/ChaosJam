@@ -35,7 +35,7 @@ draw :: proc() {
 
 
     if cheat_mode {
-        cheat_msg := fmt.ctprintf("CHEATMODE\n-{}", strings.to_string(game.target_file))
+        cheat_msg := fmt.ctprintf("CHEATMODE\n-{}", search_ctx_get_path(game.target_file))
         draw_text(cheat_msg, {10, 10}, rl.GREEN, font_size=26)
     }
     
