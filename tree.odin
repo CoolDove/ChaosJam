@@ -36,6 +36,8 @@ VALID_EXT :: []string {
     ".toml",
     ".sql",
     ".ini",
+    ".csproj",
+    ".sln",
 
     ".exe",
     ".dll",
