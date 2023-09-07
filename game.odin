@@ -28,6 +28,9 @@ Game :: struct {
 GameState :: enum {
     Talk,
     WaitForDrop,
+    Finish_FailedToFindTarget,
+    Finish_TargetLost,
+    Finish_Succeed,
 }
 
 game : Game
@@ -42,11 +45,13 @@ game_begin :: proc() {
     strings.builder_init(&game.target_file)
 
     search_ctx_init()
-    find_target_file(&game.target_file)
 
-    _talk_init()
-
-    talk_game_start()
+    if find_target_file(&game.target_file) {
+        _talk_init()
+        talk_game_start()
+    } else {
+        game.state = .Finish_FailedToFindTarget
+    }
 
 }
 
@@ -60,6 +65,7 @@ game_end :: proc() {
     
     tweener_release(&game.tweener)
 }
+
 
 game_update :: proc(delta: f32) {
     tweener_update(&game.tweener, delta)
@@ -97,6 +103,12 @@ game_update :: proc(delta: f32) {
         if cheat_mode && rl.IsMouseButtonPressed(.RIGHT) {
             talk_resp_eat_good()
             game.state = .Talk
+        }
+    case .Finish_FailedToFindTarget:
+    case .Finish_TargetLost:
+    case .Finish_Succeed:
+        if rl.GetKeyPressed() != .KEY_NULL {
+            rl.CloseWindow()
         }
     }
 }

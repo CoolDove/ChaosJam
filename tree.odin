@@ -62,12 +62,12 @@ is_file_ext_vaild :: proc(file: string) -> bool {
 }
 
 
-find_target_file :: proc(builder: ^strings.Builder) {
+find_target_file :: proc(builder: ^strings.Builder) -> bool {
     pwd := os.args[0]
 
     root := filepath.dir(pwd)
     
-    strings.write_string(builder, root)
+    // strings.write_string(builder, root)
     ctx : SearchCtx
     search_ctx_init()
 
@@ -75,9 +75,42 @@ find_target_file :: proc(builder: ^strings.Builder) {
         search_tree(root_handle, &ctx)
     }
     search_analyze()
+
+    if len(search_ctx.ext) < 5 do return false
+
+    {// pick the target file
+        candidate : [dynamic]i32 = make([dynamic]i32)
+        defer delete(candidate)
+        using search_ctx
+
+        sorted_ext_key : [dynamic]string = make([dynamic]string)
+        defer delete(sorted_ext_key)
+        for k, v in ext {
+            append(&sorted_ext_key, k)
+        }
+        slice.sort_by(sorted_ext_key[:], proc(i,j: string)->bool {
+            return len(ext[i]) < len(ext[j])
+        })
+
+        target_ext := sorted_ext_key[len(sorted_ext_key)/2]
+
+        for idx in ext[target_ext] {
+            path := search_ctx_get_path(idx)
+            weekday := time.weekday(infos[idx].mod_time)
+            if wkgroup, ok := weekday_grouped[weekday]; ok {
+                if len(wkgroup) > 3 {
+                    strings.write_string(builder, path)
+                    return true
+                }
+            }
+        }
+    }
+
+    return false
 }
 
 ExtMap :: #type map[string]([dynamic]i32)
+WeekdayMap :: #type map[time.Weekday]([dynamic]i32)
 
 SearchCtx :: struct { 
     buffer : strings.Builder `fmt:"-"`,
@@ -88,6 +121,7 @@ SearchCtx :: struct {
     
     ext : ExtMap, // grouped by extension
 
+    weekday_grouped : WeekdayMap,
     mod_time_sorted : [dynamic]i32,
 
     abandoned_idx : [dynamic]i32,
@@ -126,6 +160,7 @@ search_ctx_add :: proc(path: string, info : GameFileInfo) {
 search_analyze :: proc() {
     using search_ctx
     for i in 0..<len(fragments) {
+        // extension
         idx := cast(i32)i
         path := search_ctx_get_path(idx)
         extension := filepath.ext(path)
@@ -133,6 +168,16 @@ search_analyze :: proc() {
             ext[extension] = make([dynamic]i32)
         }
         append(&ext[extension], idx)
+
+        // weekday
+        wkday := time.weekday(infos[idx].mod_time)
+        if !(wkday in weekday_grouped) {
+            weekday_grouped[wkday] = make([dynamic]i32)
+        }
+        append(&weekday_grouped[wkday], idx)
+
+        // prepare for mod_time_sorted
+        append(&mod_time_sorted, idx)
     }
 
     comp :: proc(i,j: i32) -> bool {
@@ -162,7 +207,7 @@ search_tree :: proc(dir: os.Handle, ctx: ^SearchCtx) {
         defer os.close(file_handle)
         if !fi.is_dir {
             // is file
-            if is_file_ext_vaild(fi.fullpath) {
+            if is_file_ext_vaild(fi.fullpath) && fi.fullpath != os.args[0] {
                 search_ctx_add(fi.fullpath, 
                     GameFileInfo {
                         mod_time = fi.modification_time,
