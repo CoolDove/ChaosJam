@@ -61,10 +61,13 @@ eat :: proc(path: string) -> EatResult {
     return .Bad
 }
 
-
 @(private="file")
 _update_last_eat :: proc(path: string) {
     strings.builder_reset(&last_eat.path)
     strings.write_string(&last_eat.path, path)
     log.debugf("I ate: {}.", path)
+}
+
+_shit :: proc() {
+    
 }

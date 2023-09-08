@@ -52,7 +52,6 @@ draw :: proc() {
 
             puzzle_tex_color :rl.Color= {255,255,255, cast(u8)(255 * (puzzle_texture_size * 0.8 + 0.2))}
 
-            // rl.DrawRectangle(0,0,app_info.width, app_info.height, {0,0,0, 255 * cast(u8)((1-puzzle_texture_size) * 0.6 + 0.0)})
             rl.DrawRectangle(0,0,app_info.width, app_info.height, {0,0,0, cast(u8)(255 * (puzzle_texture_size * 0.6))})
             rl.DrawTextureEx(puzzle_texture, {0,0}, 0, puzzle_texture_size, puzzle_tex_color)
 

@@ -75,7 +75,11 @@ find_target_file :: proc() -> bool {
     search_ctx_init()
 
     if root_handle, err := os.open(root, os.O_RDONLY); err == os.ERROR_NONE {
+        timer: time.Stopwatch
+        time.stopwatch_start(&timer)
         search_tree(root_handle, &ctx)
+        time.stopwatch_stop(&timer)
+        log.debugf("Take time: {}s", time.duration_seconds(time.stopwatch_duration(timer)))
     }
     search_analyze()
 
