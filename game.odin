@@ -28,6 +28,8 @@ Game :: struct {
 
     fail_count : i32,
     mercy_tipped : bool,
+
+    feed_requirement, feed_satisfied : i32,
     
 }
 
@@ -62,6 +64,7 @@ game_begin :: proc() {
         game.state = .Finish_FailedToFindTarget
     }
 
+    set_feed(get_puzzle_requirements_feed())
 }
 
 game_end :: proc() {
@@ -78,12 +81,17 @@ game_update :: proc(delta: f32) {
 
     switch game.state {
     case .Talk:
-        if rl.IsKeyPressed(.L) {
+        if cheat_mode && rl.IsKeyPressed(.L) {
             log.debugf("the ctx: {}", search_ctx)
         }
         
         if _talk_update(delta) {
             rl.UnloadDroppedFiles(rl.LoadDroppedFiles())
+            if reset_feed != -1 {
+                game.feed_requirement = reset_feed
+                game.feed_satisfied = 0
+                reset_feed = -1
+            }
             if game.puzzle_arranged {
                 game.state = .Puzzle
             } else {
@@ -103,10 +111,14 @@ game_update :: proc(delta: f32) {
                     if !game.mercy_tipped && game.fail_count >= 2 {
                         game.mercy_tipped = true;
                         arrange_puzzle()
+                        set_feed(get_puzzle_requirements_feed())
                     }
                     talk_resp_eat_bad()
                 case .Good:
-                    arrange_puzzle()
+                    if game.feed_satisfied >= game.feed_requirement {
+                        arrange_puzzle()
+                        set_feed(get_puzzle_requirements_feed())
+                    }
                     talk_resp_eat_good()
                 case .Plain:
                     talk_resp_eat_plain()
@@ -127,8 +139,10 @@ game_update :: proc(delta: f32) {
     case .Puzzle:
         if puzzle() {
             talk_puzzle()
+            set_feed(get_puzzle_requirements_feed())
         } else {
             talk_no_puzzle()
+            set_feed(0)
         }
         game.puzzle_arranged = false
     case .Finish_FailedToFindTarget:
@@ -138,6 +152,12 @@ game_update :: proc(delta: f32) {
             rl.CloseWindow()
         }
     }
+}
+
+reset_feed : i32
+
+set_feed :: proc(require: i32) {
+    reset_feed = require
 }
 
 arrange_puzzle :: proc() {

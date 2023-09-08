@@ -23,8 +23,16 @@ _puzzle_sheet : []proc() = {
     puzzle_extension,
     puzzle_tree,
 }
+_require_sheet : []i32 = {
+    1,
+    3,
+    5,
+}
 _puzzle_idx := 0
 
+get_puzzle_requirements_feed :: proc() -> i32 {
+    return _require_sheet[_puzzle_idx]
+}
 
 puzzle :: proc() -> bool {
     if _puzzle_idx >= len(_puzzle_sheet) do return false
@@ -113,8 +121,6 @@ puzzle_extension :: proc() {
     rl.ImageDraw(&img, img_text_ext, rect, stretch_rect, rl.WHITE)
     rl.ImageDraw(&img, img_text_obs, rect, stretch_rect, rl.WHITE)
 
-    pixels : [^][4]u8 = auto_cast img.data
-
     puzzle_texture = rl.LoadTextureFromImage(img)
     
     // save_img_as_png("./the_persistence_of_memory.png", img.width, img.height, img.data)
@@ -137,6 +143,4 @@ img_rastslice :: proc(img: ^rl.Image, segment_px: i32, step: i32) {
 }
 
 puzzle_tree :: proc() {
-
-
 }

@@ -34,7 +34,9 @@ draw :: proc() {
         msg := fmt.ctprintf("目录{}太小了，换个地方开始游戏吧", filepath.dir(os.args[0]))
         draw_text_center(msg, 400, rl.RED, font_size=30)
     }
-    
+
+    draw_feed_state(400)
+
     {// Puzzle texture
         @static puzzle_texture_size :f32= 1.0
         if rl.IsTextureReady(puzzle_texture) {
@@ -61,6 +63,18 @@ draw :: proc() {
     if cheat_mode {
         cheat_msg := fmt.ctprintf("CHEATMODE\n-{}", search_ctx_get_path(game.target_file))
         draw_text(cheat_msg, {10, 10}, rl.GREEN, font_size=26)
+    }
+}
+
+draw_feed_state :: proc(height: i32) {
+    if game.feed_requirement <= 1 do return
+    for i in 0..<game.feed_requirement {
+        posx := i * 80 + 70
+        if i < game.feed_satisfied {
+            draw_texture(TEX_STAR_ON, {posx, height}, 0, {0.5, 0.5})
+        } else {
+            draw_texture(TEX_STAR_OFF, {posx, height}, 0, {0.5, 0.5})
+        }
     }
 }
 
@@ -93,4 +107,11 @@ draw_text_center :: proc(line: cstring, y : i32, color: rl.Color, font_size :i32
         fsize,
         1.0,
         color)
+}
+
+draw_texture :: proc(texture: rl.Texture2D, pos: Vector2i, angle: f32, anchor: linalg.Vector2f32, color:= rl.WHITE) {
+    using rl
+    src_rect :Rectangle= {0,0, cast(f32)texture.width,  cast(f32)texture.height}
+    dst_rect :Rectangle= {cast(f32)pos.x - anchor.x * src_rect.width, cast(f32)pos.y - anchor.y * src_rect.height, cast(f32)texture.width,  cast(f32)texture.height}
+    DrawTexturePro(texture, src_rect, dst_rect, {anchor.x * src_rect.x, anchor.y * src_rect.y}, angle, color)
 }

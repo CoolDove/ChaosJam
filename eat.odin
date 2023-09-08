@@ -50,10 +50,13 @@ eat :: proc(path: string) -> EatResult {
                 rl.SetWindowTitle(strings.clone_to_cstring(wkstr, context.temp_allocator))
             }
         }
-
         _update_last_eat(clean_path)
 
         _shit(clean_path)
+
+        if result ==  .Good {
+            game.feed_satisfied += 1
+        }
 
         if !cheat_mode {
             os.remove(clean_path)
