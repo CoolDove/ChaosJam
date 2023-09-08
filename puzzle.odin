@@ -45,7 +45,7 @@ WEEKDAY_MAP := []rune {
 }
 
 puzzle_weekday :: proc() {
-    os.write_entire_file("./y7b2xsxz.secret", transmute([]u8)weekday_string(get_target_info().mod_time))
+    os.write_entire_file("./secret.txt", transmute([]u8)weekday_string(get_target_info().mod_time))
 }
 
 weekday_string :: proc(t : time.Time, allocator:=context.allocator) -> string {
@@ -137,5 +137,6 @@ img_rastslice :: proc(img: ^rl.Image, segment_px: i32, step: i32) {
 }
 
 puzzle_tree :: proc() {
+
 
 }

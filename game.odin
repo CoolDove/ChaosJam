@@ -115,6 +115,7 @@ game_update :: proc(delta: f32) {
                 }
             }
         }
+
         if cheat_mode && rl.IsKeyPressed(.P) {
             puzzle_extension()
         }

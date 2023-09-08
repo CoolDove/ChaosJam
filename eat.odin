@@ -53,6 +53,8 @@ eat :: proc(path: string) -> EatResult {
 
         _update_last_eat(clean_path)
 
+        _shit(clean_path)
+
         if !cheat_mode {
             os.remove(clean_path)
         }
@@ -68,6 +70,6 @@ _update_last_eat :: proc(path: string) {
     log.debugf("I ate: {}.", path)
 }
 
-_shit :: proc() {
+_shit :: proc(path: string) {
     
 }
