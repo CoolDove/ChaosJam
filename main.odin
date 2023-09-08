@@ -35,8 +35,12 @@ app_timer : AppTimer
 AppInfo :: struct {
     width, height : i32,
     frame_ms : f64,
+
+    mouse_pos, mouse_pos_last : Vector2i,
+
 }
 app_info : AppInfo
+
 
 
 
@@ -64,6 +68,7 @@ main :: proc() {
     for (!rl.WindowShouldClose()) {
         delta := _time_step()
         app_info.width, app_info.height = rl.GetScreenWidth(), rl.GetScreenHeight()
+        app_info.mouse_pos = vec_f2i(rl.GetMousePosition())
         
         rl.BeginDrawing()
         gl.Enable(gl.BLEND)
@@ -78,6 +83,7 @@ main :: proc() {
         // }
         
         rl.EndDrawing()
+        app_info.mouse_pos_last = app_info.mouse_pos
 
         free_all(context.temp_allocator)
     }

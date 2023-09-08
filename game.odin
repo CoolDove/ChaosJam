@@ -42,6 +42,8 @@ GameState :: enum {
 
 game : Game
 
+
+
 game_begin :: proc() {
     cheat_mode = INIT_CHEAT_MODE
     
@@ -69,7 +71,6 @@ game_end :: proc() {
     search_ctx_destroy()
     tweener_release(&game.tweener)
 }
-
 
 game_update :: proc(delta: f32) {
     tweener_update(&game.tweener, delta)

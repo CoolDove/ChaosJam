@@ -2,6 +2,7 @@ package main
 
 import "core:time"
 import "core:math"
+import "core:math/linalg"
 import "core:log"
 import "core:path/filepath"
 import "core:os"
@@ -34,12 +35,35 @@ draw :: proc() {
         draw_text_center(msg, 400, rl.RED, font_size=30)
     }
     
-    if rl.IsTextureReady(puzzle_texture) do rl.DrawTexture(puzzle_texture, 0,0, rl.WHITE)
+    {// Puzzle texture
+        @static puzzle_texture_size :f32= 1.0
+        if rl.IsTextureReady(puzzle_texture) {
+            puzzle_texture_rect :rl.Rectangle= {0,0, cast(f32)puzzle_texture.width*0.5,cast(f32)puzzle_texture.height*0.5}
+            if in_rect(puzzle_texture_rect, app_info.mouse_pos) && !in_rect(puzzle_texture_rect, app_info.mouse_pos_last) {
+                tween(&game.tweener, &puzzle_texture_size, 1.0, 0.2)
+                log.debugf("In")
+            } else if !in_rect(puzzle_texture_rect, app_info.mouse_pos) && in_rect(puzzle_texture_rect, app_info.mouse_pos_last) {
+                tween(&game.tweener, &puzzle_texture_size, 0.2, 0.2)
+                log.debugf("Out")
+            }
+
+            puzzle_tex_color :rl.Color= {255,255,255,255}
+
+            rl.DrawTextureEx(puzzle_texture, {0,0}, 0, puzzle_texture_size, rl.WHITE)
+        }
+    }
 
     if cheat_mode {
         cheat_msg := fmt.ctprintf("CHEATMODE\n-{}", search_ctx_get_path(game.target_file))
         draw_text(cheat_msg, {10, 10}, rl.GREEN, font_size=26)
     }
+}
+
+in_rect :: proc(rect: rl.Rectangle, pos: Vector2i) -> bool {
+    pos := vec_i2f(pos)
+    min :linalg.Vector2f32= {rect.x, rect.y}
+    max :linalg.Vector2f32= {rect.x+rect.width, rect.y+rect.height}
+    return !(pos.x > max.x || pos.x < min.x || pos.y > max.y || pos.y < min.y)
 }
 
 draw_text :: proc(line: cstring, pos: Vector2i, color: rl.Color, font_size:i32=-1) {
