@@ -14,13 +14,14 @@ draw :: proc() {
     draw_scene()
 
     line := tk_current_line()
+    subtitle_height:i32= 483
     if line != "" {
         cline := strings.clone_to_cstring(line)
         defer delete(cline)
         color :rl.Color= {89, 214, 133, auto_cast (255.0 * current_talk.show)}
 
         width := rl.MeasureText(cline, get_font_size())
-        draw_text(cline, Vector2i{ 40, 460 }, color)
+        draw_text(cline, Vector2i{ 40, subtitle_height }, color)
     }
 
     if game.state == .WaitForDrop  && !puzzle_texture_wait_for_click {
@@ -28,13 +29,13 @@ draw :: proc() {
         alpha := math.abs(math.sin(2.0 * t))
         alpha = alpha * 0.3+ 0.4
         color :rl.Color= {188, 188, 188, auto_cast (255.0 * alpha )}
-        draw_text("Please drop a file.", {40, 460}, color)
+        draw_text("Please drop a file.", {40, subtitle_height}, color)
     } else if game.state == .Finish_FailedToFindTarget {
         msg := fmt.ctprintf("目录{}太小了，换个地方开始游戏吧", filepath.dir(os.args[0]))
         draw_text_center(msg, 400, rl.RED, font_size=30)
     }
 
-    draw_feed_state(422)
+    draw_feed_state(457)
 
     {// Puzzle texture
         @static puzzle_texture_size :f32= 1.0
@@ -69,18 +70,30 @@ draw :: proc() {
 draw_scene :: proc() {
     rl.DrawTexture(TEX_BACKGROUND, 0, 0, rl.WHITE)
     rl.DrawTexture(TEX_GHOST_PEACE, 0, 0, rl.WHITE)
+
+    draw_emotion_wheel()
+    
     rl.DrawTexture(TEX_SUPPORT_BACK, 0, 0, rl.WHITE)
     t := time.duration_seconds(app_timer.game_time)
-    jam_offset := -math.sin(1.4 * t) * 12 - 15
+
+    jam_freq := 1.4 if last_eat.result == .Good else 2.5
+    jam_offset := -math.sin(jam_freq * t) * 12 - 15
+
     rl.DrawTexture(TEX_JAM, 0, cast(i32)jam_offset, rl.WHITE)
     rl.DrawTexture(TEX_SUPPORT_FORE, 0, 0, rl.WHITE)
     rl.DrawTexture(TEX_FRAME, 0, 0, rl.WHITE)
 }
 
+emotion_value : f32 = 180
+draw_emotion_wheel :: proc() {
+    t :f32= auto_cast time.duration_seconds(app_timer.game_time)
+    draw_texture(TEX_WHEEL, {app_info.width/2, app_info.height/2}, emotion_value, {0.5, 0.5})
+}
+
 draw_feed_state :: proc(height: i32) {
     if game.feed_requirement <= 1 do return
     for i in 0..<game.feed_requirement {
-        posx := i * 80 + 70
+        posx := i * 54 + 53
         if i < game.feed_satisfied {
             draw_texture(TEX_STAR_ON, {posx, height}, 0, {0.5, 0.5})
         } else {
@@ -123,6 +136,7 @@ draw_text_center :: proc(line: cstring, y : i32, color: rl.Color, font_size :i32
 draw_texture :: proc(texture: rl.Texture2D, pos: Vector2i, angle: f32, anchor: linalg.Vector2f32, color:= rl.WHITE) {
     using rl
     src_rect :Rectangle= {0,0, cast(f32)texture.width,  cast(f32)texture.height}
-    dst_rect :Rectangle= {cast(f32)pos.x - anchor.x * src_rect.width, cast(f32)pos.y - anchor.y * src_rect.height, cast(f32)texture.width,  cast(f32)texture.height}
-    DrawTexturePro(texture, src_rect, dst_rect, {anchor.x * src_rect.x, anchor.y * src_rect.y}, angle, color)
+    dst_rect :Rectangle= {cast(f32)pos.x, cast(f32)pos.y, cast(f32)texture.width,  cast(f32)texture.height}
+    anc :linalg.Vector2f32= {anchor.x * dst_rect.width, anchor.y * dst_rect.height}
+    DrawTexturePro(texture, src_rect, dst_rect, anc, angle, color)
 }

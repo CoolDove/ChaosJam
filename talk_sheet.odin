@@ -12,9 +12,8 @@ talk_game_start :: proc() {
     _talk_begin()
 }
 
-
-talk_resp_chew:: proc() {
-}
+// talk_resp_chew:: proc() {
+// }
 
 talk_puzzle:: proc() {
     tk_clear()
@@ -24,14 +23,14 @@ talk_puzzle:: proc() {
 
 talk_no_puzzle:: proc() {
     tk_clear()
-    tk_push("*它已经不再有耐心*")
+    tk_push("*茧已经不再有耐心*")
     _talk_begin()
 }
 
 talk_resp_eat_good :: proc() {
     tk_clear()
-    tk_push("茧缩紧了身体，\n在一阵短促的颤抖后平静了下来。")
-    tk_push("“略有一些相似，但不足以糊弄我。”")
+    tk_push("茧缩紧了身体，\n在一阵满足的颤抖后平静了下来。")
+    tk_push("“略有一些相似，但还不足以糊弄我。”")
     _talk_begin()
 }
 

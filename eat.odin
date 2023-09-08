@@ -16,6 +16,7 @@ EatResult :: enum {
 
 EatRecord :: struct {
     path : strings.Builder,
+    result : EatResult,
 }
 
 last_eat : EatRecord
@@ -28,12 +29,13 @@ eat :: proc(path: string) -> EatResult {
             delete(clean_path)
             delete(clean_self_path)
         }
-
-        if clean_path == clean_self_path { return .EatSelf }
-
         result : EatResult= .Plain
 
-        {// analyze eat result
+        if clean_path == clean_self_path { 
+            result = .EatSelf 
+        }
+
+        if result == .Plain {// analyze eat result
             ext := filepath.ext(path)
             target_info := search_ctx.infos[game.target_file]
             
@@ -46,33 +48,51 @@ eat :: proc(path: string) -> EatResult {
                     log.debugf("Eat: Same weekday")
                     result = .Good
                 }
+                // time.clock_from_time(target_info.mod_time)
                 wkstr := weekday_string(stat.modification_time, context.temp_allocator)
                 rl.SetWindowTitle(strings.clone_to_cstring(wkstr, context.temp_allocator))
             }
-        }
-        _update_last_eat(clean_path)
+            _shit(clean_path)
 
-        _shit(clean_path)
+            if !cheat_mode {
+                os.remove(clean_path)
+            }        
+        }
 
         if result ==  .Good {
             game.feed_satisfied += 1
+            set_emotion(.Peace)
+        } else if result == .EatSelf || result == .Bad || result == .Plain {
+            set_emotion(.Angry)
         }
 
-        if !cheat_mode {
-            os.remove(clean_path)
-        }
+        _update_last_eat(clean_path, result)
+
+
         return result
     }
     return .Bad
 }
 
 @(private="file")
-_update_last_eat :: proc(path: string) {
+_update_last_eat :: proc(path: string, result: EatResult) {
     strings.builder_reset(&last_eat.path)
     strings.write_string(&last_eat.path, path)
-    log.debugf("I ate: {}.", path)
+    last_eat.result = result
+    log.debugf("last eat: {}", result)
 }
 
 _shit :: proc(path: string) {
     
+}
+
+
+Emotion :: enum {
+    Peace,  Angry,
+}
+set_emotion :: proc(emotion: Emotion) {
+    target :f32= 0 if emotion == .Angry else 180
+    tween(&game.tweener, &emotion_value, target, 1.0)
+
+    log.debugf("emo target: {}.{}", emotion, target)
 }

@@ -75,6 +75,10 @@ main :: proc() {
         rl.ClearBackground({0,0,0,0})
 
         game_update(delta)
+
+        if rl.IsKeyPressed(.B) {
+// set_window_mode(.Fullscreen)
+        }
         
         draw()
 
@@ -130,5 +134,5 @@ set_window_mode :: proc(mode: WindowMode) {
 }
 
 get_font_size :: #force_inline proc() -> i32 {
-    return 45
+    return 38
 }
