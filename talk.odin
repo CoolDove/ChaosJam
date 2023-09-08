@@ -29,7 +29,8 @@ _talk_begin :: proc() {
     tween(&game.tweener, &current_talk.show, 1.0, 0.2)
 }
 _talk_update :: proc(delta: f32) -> bool {
-    if rl.IsKeyPressed(.ENTER) || rl.IsMouseButtonPressed(.LEFT) {
+    can_press := cheat_mode || current_talk.show > 0.95
+    if can_press && rl.IsKeyPressed(.ENTER) || rl.IsMouseButtonPressed(.LEFT) {
         current_talk.idx += 1
         current_talk.show = 0.0
         tween(&game.tweener, &current_talk.show, 1.0, 0.2)

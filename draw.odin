@@ -20,22 +20,21 @@ draw :: proc() {
         color :rl.Color= {128, 200, 60, auto_cast (255.0 * current_talk.show)}
 
         width := rl.MeasureText(cline, get_font_size())
-        draw_text(cline, Vector2i{ app_info.width/2 - width/2, 460 }, color)
+        draw_text(cline, Vector2i{ 40, 460 }, color)
     }
 
     if game.state == .WaitForDrop {
         t := time.duration_seconds(app_timer.game_time)
         alpha := math.abs(math.sin(2.0 * t))
-        alpha = alpha * 0.8+0.2
+        alpha = alpha * 0.3+ 0.4
         color :rl.Color= {188, 188, 188, auto_cast (255.0 * alpha )}
-        draw_text_center("Please drop a file.", 500, color)
+        draw_text("Please drop a file.", {40, 460}, color)
     } else if game.state == .Finish_FailedToFindTarget {
         msg := fmt.ctprintf("目录{}太小了，换个地方开始游戏吧", filepath.dir(os.args[0]))
         draw_text_center(msg, 400, rl.RED, font_size=30)
     }
     
     if rl.IsTextureReady(puzzle_texture) do rl.DrawTexture(puzzle_texture, 0,0, rl.WHITE)
-
 
     if cheat_mode {
         cheat_msg := fmt.ctprintf("CHEATMODE\n-{}", search_ctx_get_path(game.target_file))
