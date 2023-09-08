@@ -61,6 +61,7 @@ weekday_string :: proc(t : time.Time, allocator:=context.allocator) -> string {
 }
 
 puzzle_texture : rl.Texture2D
+puzzle_texture_wait_for_click : bool = false
 
 puzzle_extension :: proc() {
     // get_target_info()
@@ -118,6 +119,7 @@ puzzle_extension :: proc() {
     
     // save_img_as_png("./the_persistence_of_memory.png", img.width, img.height, img.data)
     save_img_as_png("./secret_card", img.width, img.height, img_card.data)
+    puzzle_texture_wait_for_click = true
 }
 
 // step: 0 or 1

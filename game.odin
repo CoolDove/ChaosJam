@@ -91,7 +91,7 @@ game_update :: proc(delta: f32) {
             }
         }
     case .WaitForDrop:
-        if rl.IsFileDropped() {
+        if !puzzle_texture_wait_for_click && rl.IsFileDropped() {
             filepath_list := rl.LoadDroppedFiles()
             defer rl.UnloadDroppedFiles(filepath_list)
             path := filepath_list.paths[0]
