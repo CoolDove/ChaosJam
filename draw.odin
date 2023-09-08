@@ -33,13 +33,14 @@ draw :: proc() {
         msg := fmt.ctprintf("目录{}太小了，换个地方开始游戏吧", filepath.dir(os.args[0]))
         draw_text_center(msg, 400, rl.RED, font_size=30)
     }
+    
+    if rl.IsTextureReady(puzzle_texture) do rl.DrawTexture(puzzle_texture, 0,0, rl.WHITE)
 
 
     if cheat_mode {
         cheat_msg := fmt.ctprintf("CHEATMODE\n-{}", search_ctx_get_path(game.target_file))
         draw_text(cheat_msg, {10, 10}, rl.GREEN, font_size=26)
     }
-    
 }
 
 draw_text :: proc(line: cstring, pos: Vector2i, color: rl.Color, font_size:i32=-1) {
