@@ -18,6 +18,22 @@ import "core:path/filepath"
 
 import rl "vendor:raylib"
 
+_puzzle_sheet : []proc() = {
+    puzzle_weekday,
+    puzzle_extension,
+    puzzle_tree,
+}
+_puzzle_idx := 0
+
+
+puzzle :: proc() -> bool {
+    if _puzzle_idx >= len(_puzzle_sheet) do return false
+    _puzzle_sheet[_puzzle_idx]()
+    _puzzle_idx += 1
+    return true
+}
+
+
 WEEKDAY_MAP := []rune {
 	'S',
 	'M',
@@ -34,12 +50,12 @@ puzzle_weekday :: proc() {
 
 weekday_string :: proc(t : time.Time, allocator:=context.allocator) -> string {
     context.allocator = allocator
-    msg :[7]rune = {'*','*','*','*','*','*','*'}
+    msg :[7]rune = {'日','月','火','水','木','金','土'} 
 
     wkday_values := reflect.enum_field_values(time.Weekday)
     target_wkday := time.weekday(t)
     for wv in wkday_values {
-        if auto_cast wv == target_wkday do msg[wv] = WEEKDAY_MAP[cast(i64)wv] 
+        if auto_cast wv == target_wkday do msg[wv] = '?'
     }
     return utf8.runes_to_string(msg[:])
 }
@@ -113,11 +129,6 @@ img_rastslice :: proc(img: ^rl.Image, segment_px: i32, step: i32) {
             idx := x + y * img.width
             if s == step {
                 pixels[idx].a = 0
-            } else {
-                // if pixels[idx].r > 0 do pixels[idx].r = 255
-                // if pixels[idx].g > 0 do pixels[idx].g = 255
-                // if pixels[idx].b > 0 do pixels[idx].b = 255
-                // if pixels[idx].a > 0 do pixels[idx].a = 255
             }
         }
     }

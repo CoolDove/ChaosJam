@@ -123,9 +123,12 @@ game_update :: proc(delta: f32) {
             talk_resp_eat_good()
         }
     case .Puzzle:
-        puzzle_weekday()
+        if puzzle() {
+            talk_puzzle()
+        } else {
+            talk_no_puzzle()
+        }
         game.puzzle_arranged = false
-        talk_puzzle()
     case .Finish_FailedToFindTarget:
     case .Finish_TargetLost:
     case .Finish_Succeed:

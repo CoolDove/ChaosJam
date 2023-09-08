@@ -23,10 +23,16 @@ talk_puzzle:: proc() {
     _talk_begin()
 }
 
+talk_no_puzzle:: proc() {
+    tk_clear()
+    tk_push("*茧已经不再有耐心*")
+    _talk_begin()
+}
+
 talk_resp_eat_good :: proc() {
     tk_clear()
     tk_push("茧缩紧了身体，\n在一阵短促的颤抖后平静了下来。")
-    tk_push("“很接近了，继续寻找吧。”")
+    tk_push("“略有一些相似，但不足以糊弄我。”")
     _talk_begin()
 }
 
