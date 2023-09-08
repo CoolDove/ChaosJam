@@ -5,11 +5,10 @@ import "core:strings"
 
 talk_game_start :: proc() {
     tk_clear()
-    tk_push("电脑里出现了一只丑陋的卵......")
-    tk_push("你注视着它，它就像是一张薄薄的纸\n包裹着一团蠕动的液体，")
-    tk_push("上面有一个口状的器官微微翕动着。\n")
-    tk_push("它察觉到了你，微弱的声音从他的口中发出：")
-    tk_push("“把你最重要的东西交给我。”")
+    tk_push("电脑里出现了一只丑陋的茧......")
+    tk_push("你注视着它，它表面的黑色花纹缓缓蠕动，\n看不穿里面有什么。")
+    tk_push("它察觉到了你，微弱的声音从空气中渗出：")
+    tk_push("“把你最重要的东西献给我。”")
     _talk_begin()
 }
 
@@ -25,7 +24,7 @@ talk_puzzle:: proc() {
 
 talk_no_puzzle:: proc() {
     tk_clear()
-    tk_push("*茧已经不再有耐心*")
+    tk_push("*它已经不再有耐心*")
     _talk_begin()
 }
 

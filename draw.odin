@@ -11,14 +11,13 @@ import "core:strings"
 import rl "vendor:raylib"
 
 draw :: proc() {
-    rl.DrawTexture(TEX_JAM_IDLE, 0, 0, rl.WHITE)
-    rl.DrawTexture(TEX_SUBTITLE_MASK, 0, 0, rl.WHITE)
+    draw_scene()
 
     line := tk_current_line()
     if line != "" {
         cline := strings.clone_to_cstring(line)
         defer delete(cline)
-        color :rl.Color= {128, 200, 60, auto_cast (255.0 * current_talk.show)}
+        color :rl.Color= {89, 214, 133, auto_cast (255.0 * current_talk.show)}
 
         width := rl.MeasureText(cline, get_font_size())
         draw_text(cline, Vector2i{ 40, 460 }, color)
@@ -35,7 +34,7 @@ draw :: proc() {
         draw_text_center(msg, 400, rl.RED, font_size=30)
     }
 
-    draw_feed_state(400)
+    draw_feed_state(422)
 
     {// Puzzle texture
         @static puzzle_texture_size :f32= 1.0
@@ -64,6 +63,18 @@ draw :: proc() {
         cheat_msg := fmt.ctprintf("CHEATMODE\n-{}", search_ctx_get_path(game.target_file))
         draw_text(cheat_msg, {10, 10}, rl.GREEN, font_size=26)
     }
+}
+
+
+draw_scene :: proc() {
+    rl.DrawTexture(TEX_BACKGROUND, 0, 0, rl.WHITE)
+    rl.DrawTexture(TEX_GHOST_PEACE, 0, 0, rl.WHITE)
+    rl.DrawTexture(TEX_SUPPORT_BACK, 0, 0, rl.WHITE)
+    t := time.duration_seconds(app_timer.game_time)
+    jam_offset := -math.sin(1.4 * t) * 12 - 15
+    rl.DrawTexture(TEX_JAM, 0, cast(i32)jam_offset, rl.WHITE)
+    rl.DrawTexture(TEX_SUPPORT_FORE, 0, 0, rl.WHITE)
+    rl.DrawTexture(TEX_FRAME, 0, 0, rl.WHITE)
 }
 
 draw_feed_state :: proc(height: i32) {
