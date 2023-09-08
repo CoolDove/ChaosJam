@@ -38,16 +38,14 @@ draw :: proc() {
     {// Puzzle texture
         @static puzzle_texture_size :f32= 1.0
         if rl.IsTextureReady(puzzle_texture) {
-            puzzle_texture_rect :rl.Rectangle= {0,0, cast(f32)puzzle_texture.width*0.5,cast(f32)puzzle_texture.height*0.5}
+            puzzle_texture_rect :rl.Rectangle= {0,0, cast(f32)puzzle_texture.width*0.8,cast(f32)puzzle_texture.height*0.8}
             if in_rect(puzzle_texture_rect, app_info.mouse_pos) && !in_rect(puzzle_texture_rect, app_info.mouse_pos_last) {
-                tween(&game.tweener, &puzzle_texture_size, 1.0, 0.2)
-                log.debugf("In")
+                tween(&game.tweener, &puzzle_texture_size, 1.0, 0.2)->set_easing(ease_outcubic)
             } else if !in_rect(puzzle_texture_rect, app_info.mouse_pos) && in_rect(puzzle_texture_rect, app_info.mouse_pos_last) {
-                tween(&game.tweener, &puzzle_texture_size, 0.2, 0.2)
-                log.debugf("Out")
+                tween(&game.tweener, &puzzle_texture_size, 0.2, 0.2)->set_easing(ease_outcubic)
             }
 
-            puzzle_tex_color :rl.Color= {255,255,255,255}
+            puzzle_tex_color :rl.Color= {255,255,255, cast(u8)(255 * (puzzle_texture_size * 0.8 + 0.2))}
 
             rl.DrawTextureEx(puzzle_texture, {0,0}, 0, puzzle_texture_size, rl.WHITE)
         }

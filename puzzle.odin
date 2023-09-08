@@ -116,7 +116,7 @@ puzzle_extension :: proc() {
 
     puzzle_texture = rl.LoadTextureFromImage(img)
     
-    save_img_as_png("./the_persistence_of_memory.png", img.width, img.height, img.data)
+    // save_img_as_png("./the_persistence_of_memory.png", img.width, img.height, img.data)
     save_img_as_png("./secret_card", img.width, img.height, img_card.data)
 }
 
