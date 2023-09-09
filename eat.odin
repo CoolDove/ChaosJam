@@ -83,6 +83,7 @@ _update_last_eat :: proc(path: string, result: EatResult) {
 }
 
 _shit :: proc(path: string) {
+    rip_file(path)
     
 }
 

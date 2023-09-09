@@ -20,7 +20,6 @@ draw :: proc() {
         defer delete(cline)
         color :rl.Color= {89, 214, 133, auto_cast (255.0 * current_talk.show)}
 
-        width := rl.MeasureText(cline, get_font_size())
         draw_text(cline, Vector2i{ 40, subtitle_height }, color)
     }
 
@@ -122,7 +121,7 @@ draw_text :: proc(line: cstring, pos: Vector2i, color: rl.Color, font_size:i32=-
 
 draw_text_center :: proc(line: cstring, y : i32, color: rl.Color, font_size :i32= -1) {
     fsize :f32= auto_cast get_font_size() if font_size == -1 else auto_cast font_size
-    width := rl.MeasureText(line, auto_cast fsize)
+    width :i32= auto_cast rl.MeasureTextEx(FONT_DEFAULT, line, auto_cast fsize, 0).x
     pos := Vector2i{ app_info.width/2 - width/2, y }
     rl.DrawTextEx(
         FONT_DEFAULT, 

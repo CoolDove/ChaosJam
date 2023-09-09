@@ -8,4 +8,8 @@
 ols.json
 
 
-*.secret
+
+secret.txt
+secret_card
+*_RIP.png
+*.*~

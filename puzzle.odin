@@ -53,10 +53,15 @@ WEEKDAY_MAP := []rune {
 }
 
 puzzle_weekday :: proc() {
-    os.write_entire_file("./secret.txt", transmute([]u8)weekday_string(get_target_info().mod_time))
+    sb : strings.Builder
+    strings.builder_init(&sb)
+    defer strings.builder_destroy(&sb)
+
+    strings.write_rune(&sb, weekday_rune(time.weekday(get_target_info().mod_time)))
+    os.write_entire_file("./secret.txt", transmute([]u8)strings.to_string(sb))
 }
 
-weekday_string :: proc(t : time.Time, allocator:=context.allocator) -> string {
+weekday_string :: proc(t : time.Time, allocator:=context.temp_allocator) -> string {
     context.allocator = allocator
     msg :[7]rune = {'日','月','火','水','木','金','土'} 
 
@@ -66,6 +71,22 @@ weekday_string :: proc(t : time.Time, allocator:=context.allocator) -> string {
         if auto_cast wv == target_wkday do msg[wv] = '?'
     }
     return utf8.runes_to_string(msg[:])
+}
+
+weekday_string_inv :: proc(t : time.Time, allocator:=context.temp_allocator) -> string {
+    context.allocator = allocator
+    msg :[7]rune = {'*','*','*','*','*','*','*'} 
+
+    wkday_values := reflect.enum_field_values(time.Weekday)
+    target_wkday := time.weekday(t)
+    for wv in wkday_values {
+        if auto_cast wv == target_wkday do msg[wv] = weekday_rune(transmute(time.Weekday)wv)
+    }
+    return utf8.runes_to_string(msg[:])
+}
+weekday_rune :: proc(weekday: time.Weekday) -> rune {
+    runes :[7]rune= {'日','月','火','水','木','金','土'} 
+    return runes[transmute(int)weekday]
 }
 
 puzzle_texture : rl.Texture2D
@@ -97,7 +118,7 @@ puzzle_extension :: proc() {
 
     text_center :: proc(target: ^rl.Image, text: string, font_size :i32= 40) {
         cstr := strings.clone_to_cstring(text, context.temp_allocator)
-        measure := rl.MeasureText(cstr, font_size)
+        measure :i32= auto_cast rl.MeasureTextEx(FONT_DEFAULT, cstr, auto_cast font_size, 0).x
         pos :Vector2i= {target.width/2-measure/2, target.height/2 - 20}
         log.debugf("pos for {}: {}, measure: {}", text, pos, measure)
         rl.ImageDrawTextEx(target, FONT_DEFAULT,

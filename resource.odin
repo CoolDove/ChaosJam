@@ -24,6 +24,7 @@ RAW_PNG_JAM :: #load("./res/jam.png", []u8)
 RAW_PNG_FOLDER :: #load("./res/folder.png", []u8)
 
 RAW_PNG_PERSISTENCE_OF_MEMORY :: #load("./res/The_Persistence_of_Memory.png", []u8)
+RAW_PNG_GRAVESTONE :: #load("./res/gravestone.png", []u8)
 
 
 // -- In game
