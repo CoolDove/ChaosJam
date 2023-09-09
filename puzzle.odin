@@ -163,6 +163,10 @@ img_rastslice :: proc(img: ^rl.Image, segment_px: i32, step: i32) {
 
 puzzle_hex :: proc() {
     log.debugf("Hex puzzle!")
+    content, err := filepath.rel(get_pwd(), search_ctx_get_path(game.target_file), context.allocator)
+    defer delete(content)
+    encrypted_string := hex_encrypt_string(content)
+    os.write_entire_file("./secret2.txt", transmute([]u8)encrypted_string)
 }
 
 tree_secret_sheet : map[rune]rune
