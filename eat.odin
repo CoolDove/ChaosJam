@@ -46,6 +46,7 @@ eat :: proc(path: string) -> EatResult {
             result = .TooFresh
         }
 
+        os.close(file)
         if result == .Plain {// analyze eat result
             ext := filepath.ext(path)
             target_info := search_ctx.infos[game.target_file]
@@ -73,7 +74,8 @@ eat :: proc(path: string) -> EatResult {
             rip_file(clean_path, result == .Good || result == .Win, result==.Win)
 
             if !cheat_mode {
-                os.remove(clean_path)
+                delete_err := os.remove(clean_path)
+                log.debugf("File: {} delete error: {}.", clean_path, delete_err)
             }
         }
 

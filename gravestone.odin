@@ -44,8 +44,8 @@ rip_file :: proc(path: string, correct: bool, win: bool) {
     } else {
         _push_line(&gravestone, "这正是我想要的文件", &height, color, expadding=expadding)
         _push_line(&gravestone, "那么我就收下了", &height, color, expadding=expadding)
-        _push_line(&gravestone, "感谢你的付出", &height, color, expadding=expadding*2)
-        _push_line(&gravestone, "BV1Qv4y1r791", &height, color, expadding=expadding)
+        _push_line(&gravestone, "感谢你的付出", &height, color, expadding=expadding*4)
+        _push_line(&gravestone, "BV1Qv4y1r791", &height, {20,20,20, 64}, expadding=expadding)
     }
 
     if correct && qr_piece_idx > -1 do integrate_qrcode(&gravestone)
