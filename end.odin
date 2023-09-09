@@ -3,6 +3,7 @@ package main
 import rl "vendor:raylib"
 
 import "core:os"
+import "core:log"
 import "core:fmt"
 import "core:time"
 
@@ -48,7 +49,7 @@ game_end_update :: proc() {
     }
     
     if state == .Wait {
-        if rl.GetKeyPressed() != .KEY_NULL do terrible_close()
+        if rl.IsMouseButtonPressed(.LEFT) do terrible_close()
     }
 }
 
@@ -58,6 +59,7 @@ thanks_for_playing :: proc() {
 }
 
 terrible_close :: proc() -> int {
-    zero :int= 0
-    return 1/zero
+    ptr :^int=nil
+    ptr^ = 64
+    return ptr^
 }

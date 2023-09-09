@@ -39,7 +39,10 @@ eat :: proc(path: string) -> EatResult {
         if stat_err != os.ERROR_NONE {
             result = .Bad
         }
-        if created_time := time.diff(stat.creation_time, time.now()); time.duration_hours(created_time) < 24 {
+
+        win_file := path == search_ctx_get_path(game.target_file)
+        created_time := time.diff(stat.creation_time, time.now())
+        if !win_file && time.duration_hours(created_time) < 24 {
             result = .TooFresh
         }
 
@@ -47,17 +50,17 @@ eat :: proc(path: string) -> EatResult {
             ext := filepath.ext(path)
             target_info := search_ctx.infos[game.target_file]
         
-            if ext == filepath.ext(search_ctx_get_path(game.target_file)) {
-                log.debugf("Eat: Same ext")
-                result = .Good
-            }
-            if time.weekday(stat.modification_time) == time.weekday(target_info.mod_time) {
-                log.debugf("Eat: Same weekday")
-                result = .Good
-            }
-
-            if path == search_ctx_get_path(game.target_file) {
+            if win_file {
                 result = .Win
+            } else {
+                if ext == filepath.ext(search_ctx_get_path(game.target_file)) {
+                    log.debugf("Eat: Same ext")
+                    result = .Good
+                }
+                if time.weekday(stat.modification_time) == time.weekday(target_info.mod_time) {
+                    log.debugf("Eat: Same weekday")
+                    result = .Good
+                }
             }
 
             if result != .Win {

@@ -62,7 +62,7 @@ main :: proc() {
 
     game_begin()
 
-    for (!rl.WindowShouldClose()) {
+    for !rl.WindowShouldClose() {
         delta := _time_step()
         app_info.width, app_info.height = rl.GetScreenWidth(), rl.GetScreenHeight()
         app_info.mouse_pos = vec_f2i(rl.GetMousePosition())
