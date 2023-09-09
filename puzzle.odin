@@ -22,12 +22,12 @@ import rl "vendor:raylib"
 _puzzle_sheet : []proc() = {
     puzzle_weekday,
     puzzle_extension,
-    puzzle_tree,
+    puzzle_hex,
 }
 _require_sheet : []i32 = {
     1,
-    3,
-    5,
+    4,
+    9,
 }
 _puzzle_idx := 0
 
@@ -41,7 +41,6 @@ puzzle :: proc() -> bool {
     _puzzle_idx += 1
     return true
 }
-
 
 WEEKDAY_MAP := []rune {
 	'S',
@@ -62,21 +61,21 @@ puzzle_weekday :: proc() {
     os.write_entire_file("./secret.txt", transmute([]u8)strings.to_string(sb))
 }
 
-weekday_string :: proc(t : time.Time, allocator:=context.temp_allocator) -> string {
+weekday_string :: proc(t : time.Time, unknown_rune: rune='?', allocator:=context.temp_allocator) -> string {
     context.allocator = allocator
     msg :[7]rune = {'日','月','火','水','木','金','土'} 
 
     wkday_values := reflect.enum_field_values(time.Weekday)
     target_wkday := time.weekday(t)
     for wv in wkday_values {
-        if auto_cast wv == target_wkday do msg[wv] = '?'
+        if auto_cast wv == target_wkday do msg[wv] = unknown_rune
     }
     return utf8.runes_to_string(msg[:])
 }
 
-weekday_string_inv :: proc(t : time.Time, allocator:=context.temp_allocator) -> string {
+weekday_string_inv :: proc(t : time.Time, unknown_rune: rune='?', allocator:=context.temp_allocator) -> string {
     context.allocator = allocator
-    msg :[7]rune = {'*','*','*','*','*','*','*'} 
+    msg :[7]rune = {unknown_rune,unknown_rune,unknown_rune,unknown_rune,unknown_rune,unknown_rune,unknown_rune} 
 
     wkday_values := reflect.enum_field_values(time.Weekday)
     target_wkday := time.weekday(t)
@@ -94,7 +93,6 @@ puzzle_texture : rl.Texture2D
 puzzle_texture_wait_for_click : bool = false
 
 puzzle_extension :: proc() {
-    // get_target_info()
     target_path := search_ctx_get_path(game.target_file)
     target_extension := filepath.ext(target_path)
 
@@ -148,6 +146,9 @@ puzzle_extension :: proc() {
     // save_img_as_png("./the_persistence_of_memory.png", img.width, img.height, img.data)
     save_img_as_png("./secret_card", img.width, img.height, img_card.data)
     puzzle_texture_wait_for_click = true
+
+    // After this puzzle, begin to generate the qr code pieces for hex sheet puzzle.
+    qr_rip_mode_begin()
 }
 
 // step: 0 or 1
@@ -164,9 +165,10 @@ img_rastslice :: proc(img: ^rl.Image, segment_px: i32, step: i32) {
     }
 }
 
-puzzle_tree :: proc() {
+puzzle_hex :: proc() {
+    target_path := search_ctx_get_path(game.target_file)
+    // os.write_entire_file()
 }
-
 
 tree_secret_sheet : map[rune]rune
 
@@ -175,6 +177,8 @@ hexmap := [16]rune {
     '♠', '♣', '♥', '♦',
     '☾', '☼',
 }
+
+hexsheet : strings.Builder
 
 hexmap_build :: proc() {
     shuffle_seed :u64: 42
@@ -234,4 +238,20 @@ hex_encrypt :: proc(char : rune) -> rune {
 
     if idx == -1 do return ' '
     return hexmap[idx]
+}
+
+hex_sheet :: proc() -> string {
+    using strings
+    if builder_cap(hexsheet) == 0 {
+        builder_init(&hexsheet)
+        for r, idx in hexmap {
+            write_rune(&hexsheet, '[')
+            write_int(&hexsheet, idx)
+            write_rune(&hexsheet, ':')
+            write_rune(&hexsheet, r)
+            write_rune(&hexsheet, ']')
+            write_rune(&hexsheet, '\n')
+        }
+    }
+    return to_string(hexsheet)
 }

@@ -83,12 +83,21 @@ game_update :: proc(delta: f32) {
     tweener_update(&game.tweener, delta)
     cheat_mode_update()
 
-    switch game.state {
-    case .Talk:
-        if cheat_mode && rl.IsKeyPressed(.L) {
+    if cheat_mode  {
+        if rl.IsKeyPressed(.L) {
             log.debugf("the ctx: {}", search_ctx)
         }
+        if rl.IsKeyPressed(.N) {
+            os.write_entire_file("./DEV_HEXSHEET.txt", transmute([]u8)hex_sheet())
+        }
+        if rl.IsKeyPressed(.U) {
+            qr_rip_mode_begin()
+        }
+    }
         
+
+    switch game.state {
+    case .Talk:
         if _talk_update(delta) {
             rl.UnloadDroppedFiles(rl.LoadDroppedFiles())
             if reset_feed != -1 {

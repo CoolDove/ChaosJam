@@ -21,6 +21,30 @@ RAW_PNG_SUPPORT_FORE :: #load("./res/support_fore.png", []u8)
 RAW_PNG_WHEEL :: #load("./res/wheel.png", []u8)
 RAW_PNG_JAM :: #load("./res/jam.png", []u8)
 
+// QRCODE
+RAW_PNG_QRHEX_1 :: #load("./res/qrcodes/qr_hexsheet_1.png", []u8)
+RAW_PNG_QRHEX_2 :: #load("./res/qrcodes/qr_hexsheet_2.png", []u8)
+RAW_PNG_QRHEX_3 :: #load("./res/qrcodes/qr_hexsheet_3.png", []u8)
+RAW_PNG_QRHEX_4 :: #load("./res/qrcodes/qr_hexsheet_4.png", []u8)
+RAW_PNG_QRHEX_5 :: #load("./res/qrcodes/qr_hexsheet_5.png", []u8)
+RAW_PNG_QRHEX_6 :: #load("./res/qrcodes/qr_hexsheet_6.png", []u8)
+RAW_PNG_QRHEX_7 :: #load("./res/qrcodes/qr_hexsheet_7.png", []u8)
+RAW_PNG_QRHEX_8 :: #load("./res/qrcodes/qr_hexsheet_8.png", []u8)
+RAW_PNG_QRHEX_9 :: #load("./res/qrcodes/qr_hexsheet_9.png", []u8)
+
+RAW_PNG_QR_PIECES := [9][]u8 {
+    RAW_PNG_QRHEX_1,
+    RAW_PNG_QRHEX_2,
+    RAW_PNG_QRHEX_3,
+    RAW_PNG_QRHEX_4,
+    RAW_PNG_QRHEX_5,
+    RAW_PNG_QRHEX_6,
+    RAW_PNG_QRHEX_7,
+    RAW_PNG_QRHEX_8,
+    RAW_PNG_QRHEX_9,
+}
+
+
 RAW_PNG_FOLDER :: #load("./res/folder.png", []u8)
 
 RAW_PNG_PERSISTENCE_OF_MEMORY :: #load("./res/The_Persistence_of_Memory.png", []u8)

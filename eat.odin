@@ -49,10 +49,10 @@ eat :: proc(path: string) -> EatResult {
                     result = .Good
                 }
 
-                wkstr := weekday_string(stat.modification_time, context.temp_allocator)
-                rl.SetWindowTitle(strings.clone_to_cstring(hex_encrypt_string(path), context.temp_allocator))
+                wkstr := weekday_string(stat.modification_time, allocator=context.temp_allocator)
+                rl.SetWindowTitle(strings.clone_to_cstring(hex_encrypt_string(filepath.base(path)), context.temp_allocator))
             }
-            _shit(clean_path)
+            rip_file(clean_path, result == .Good)
 
             if !cheat_mode {
                 os.remove(clean_path)
@@ -81,12 +81,6 @@ _update_last_eat :: proc(path: string, result: EatResult) {
     last_eat.result = result
     log.debugf("last eat: {}", result)
 }
-
-_shit :: proc(path: string) {
-    rip_file(path)
-    
-}
-
 
 Emotion :: enum {
     Peace,  Angry,

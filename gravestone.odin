@@ -5,12 +5,13 @@ import "core:math/linalg"
 import "core:strings"
 import rl "vendor:raylib"
 import "core:os"
+import "core:math"
 import "core:fmt"
 import "core:time"
 import "core:path/filepath"
 
 
-rip_file :: proc(path: string, qr_piece : []u8={}) {
+rip_file :: proc(path: string, correct: bool) {
     gravestone := rl.LoadImageFromMemory(
         ".png", 
         raw_data(RAW_PNG_GRAVESTONE), 
@@ -38,14 +39,45 @@ rip_file :: proc(path: string, qr_piece : []u8={}) {
     _push_line(&gravestone, "大小", &height, color)
     size_str := fmt.ctprintf("{}", strings.trim_left(readable_format_bytes(cast(int)fi.size, context.temp_allocator), " "))
     _push_line(&gravestone, size_str, &height, color, expadding = 2*expadding)
-    // _push_line(&gravestone, "忌日", &height, color)
-    // _push_line(&gravestone, fmt.ctprintf("{}", time_string(time.now())), &height, color, expadding = 2 * expadding)
 
-    _push_line(&gravestone, fmt.ctprintf("{}", weekday_string(fi.modification_time)), &height, {60, 100, 180, 80})
+    _push_line(&gravestone, fmt.ctprintf("{}", weekday_string(fi.modification_time, unknown_rune='*')), &height, {60, 100, 180, 80})
+
+    if correct && qr_piece_idx > -1 do integrate_qrcode(&gravestone)
 
     rl.stbi_write_png(
         fmt.ctprintf("{}/{}_RIP.png", filepath.dir(path, context.temp_allocator), filepath.stem(path)),
         gravestone.width, gravestone.height, 4, gravestone.data, 0)
+}
+
+qr_piece_idx : i32 = -1
+
+qr_rip_mode_begin :: proc() {
+    qr_piece_idx = 0
+}
+
+@(private="file")
+integrate_qrcode :: proc(img: ^rl.Image) {
+    if qr_piece_idx > 8 do return
+    qr_piece := RAW_PNG_QR_PIECES[qr_piece_idx]
+    qr := rl.LoadImageFromMemory(
+        ".png", 
+        raw_data(qr_piece), 
+        auto_cast len(qr_piece))
+    defer rl.UnloadImage(qr)
+    pixels_img : [^][4]u8 = auto_cast img.data
+    pixels_qr : [^][4]u8 = auto_cast qr.data
+    assert(qr.height == img.height && qr.width == img.width, "BOOOOOM")
+    for y in 0..<img.height {
+        for x in 0..< img.width {
+            idx := x + y * img.width
+            if pixels_qr[idx].a > 128 { 
+                pix := pixels_img[idx]
+                pixels_img[idx] = {pix.r + 128, pix.g, pix.b, pix.a}
+            }
+
+        }
+    }
+    qr_piece_idx += 1
 }
 
 @(private="file")
