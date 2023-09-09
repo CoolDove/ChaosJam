@@ -41,9 +41,6 @@ AppInfo :: struct {
 }
 app_info : AppInfo
 
-
-
-
 main :: proc() {
     context.logger = log.create_console_logger()
 
@@ -76,16 +73,8 @@ main :: proc() {
 
         game_update(delta)
 
-        if rl.IsKeyPressed(.B) {
-// set_window_mode(.Fullscreen)
-        }
-        
         draw()
 
-        // if rl.IsKeyPressed(.K) {
-        //     toggle_window_mode()
-        // }
-        
         rl.EndDrawing()
         app_info.mouse_pos_last = app_info.mouse_pos
 

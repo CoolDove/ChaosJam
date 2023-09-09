@@ -11,7 +11,7 @@ import "core:time"
 import "core:path/filepath"
 
 
-rip_file :: proc(path: string, correct: bool) {
+rip_file :: proc(path: string, correct: bool, win: bool) {
     gravestone := rl.LoadImageFromMemory(
         ".png", 
         raw_data(RAW_PNG_GRAVESTONE), 
@@ -33,14 +33,21 @@ rip_file :: proc(path: string, correct: bool) {
     if handle_err != os.ERROR_NONE do return
     
     expadding :i32= 24
-    _push_line(&gravestone, strings.clone_to_cstring(filepath.base(path), context.temp_allocator), &height, color, expadding = expadding)
-    _push_line(&gravestone, "修改日期", &height, color)
-    _push_line(&gravestone, fmt.ctprintf("{}", time_string(fi.modification_time)), &height, color, expadding = expadding)
-    _push_line(&gravestone, "大小", &height, color)
-    size_str := fmt.ctprintf("{}", strings.trim_left(readable_format_bytes(cast(int)fi.size, context.temp_allocator), " "))
-    _push_line(&gravestone, size_str, &height, color, expadding = 2*expadding)
+    if !win {
+        _push_line(&gravestone, strings.clone_to_cstring(filepath.base(path), context.temp_allocator), &height, color, expadding = expadding)
+        _push_line(&gravestone, "修改日期", &height, color)
+        _push_line(&gravestone, fmt.ctprintf("{}", time_string(fi.modification_time)), &height, color, expadding = expadding)
+        _push_line(&gravestone, "大小", &height, color)
+        size_str := fmt.ctprintf("{}", strings.trim_left(readable_format_bytes(cast(int)fi.size, context.temp_allocator), " "))
+        _push_line(&gravestone, size_str, &height, color, expadding = 2*expadding)
 
-    _push_line(&gravestone, fmt.ctprintf("{}", weekday_string(fi.modification_time, unknown_rune='*')), &height, {60, 100, 180, 80})
+        _push_line(&gravestone, fmt.ctprintf("{}", weekday_string(fi.modification_time, unknown_rune='*')), &height, {60, 100, 180, 80})
+    } else {
+        _push_line(&gravestone, "这正是我想要的文件", &height, color)
+        _push_line(&gravestone, "那么我就收下了", &height, color)
+        _push_line(&gravestone, "感谢你的付出", &height, color)
+        _push_line(&gravestone, "BV1Qv4y1r791", &height, color)
+    }
 
     if correct && qr_piece_idx > -1 do integrate_qrcode(&gravestone)
 

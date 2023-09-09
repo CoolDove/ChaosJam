@@ -28,10 +28,16 @@ _require_sheet : []i32 = {
     1,
     4,
     9,
+    -1,
 }
 _puzzle_idx := 0
 
+is_the_game_last_phase :: proc() -> bool {
+    return get_puzzle_requirements_feed() == -1
+}
+
 get_puzzle_requirements_feed :: proc() -> i32 {
+    if _puzzle_idx >= len(_require_sheet) do return -1
     return _require_sheet[_puzzle_idx]
 }
 
@@ -40,16 +46,6 @@ puzzle :: proc() -> bool {
     _puzzle_sheet[_puzzle_idx]()
     _puzzle_idx += 1
     return true
-}
-
-WEEKDAY_MAP := []rune {
-	'S',
-	'M',
-	'T',
-	'W',
-	'T',
-	'F',
-	'S',
 }
 
 puzzle_weekday :: proc() {
@@ -166,8 +162,7 @@ img_rastslice :: proc(img: ^rl.Image, segment_px: i32, step: i32) {
 }
 
 puzzle_hex :: proc() {
-    target_path := search_ctx_get_path(game.target_file)
-    // os.write_entire_file()
+    log.debugf("Hex puzzle!")
 }
 
 tree_secret_sheet : map[rune]rune
@@ -190,7 +185,7 @@ hexmap_build :: proc() {
         to := rand.int63_max(16, &r)
         hexmap[from],hexmap[to] = hexmap[to],hexmap[from]
     }
-    // log.debugf("hexmap: {}", hexmap)
+
 }
 
 hex_encrypt_string :: proc(content: string, allocator:= context.allocator) -> string {

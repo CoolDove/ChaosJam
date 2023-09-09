@@ -93,8 +93,14 @@ game_update :: proc(delta: f32) {
         if rl.IsKeyPressed(.U) {
             qr_rip_mode_begin()
         }
+
+        if rl.IsKeyPressed(.P) {
+            puzzle_extension()
+        }
+        if rl.IsKeyPressed(.E) {
+            win_game()
+        }
     }
-        
 
     switch game.state {
     case .Talk:
@@ -107,6 +113,8 @@ game_update :: proc(delta: f32) {
             }
             if game.puzzle_arranged {
                 game.state = .Puzzle
+            } else if the_game_has_win {
+                game.state = .Finish_Succeed
             } else {
                 game.state = .WaitForDrop
             }
@@ -120,12 +128,6 @@ game_update :: proc(delta: f32) {
                 result := eat(cast(string)path)
                 switch result {
                 case .Bad:
-                    game.fail_count += 1 
-                    if !game.mercy_tipped && game.fail_count >= 2 {
-                        game.mercy_tipped = true;
-                        arrange_puzzle()
-                        set_feed(get_puzzle_requirements_feed())
-                    }
                     talk_resp_eat_bad()
                 case .Good:
                     if game.feed_satisfied >= game.feed_requirement {
@@ -134,17 +136,23 @@ game_update :: proc(delta: f32) {
                     }
                     talk_resp_eat_good()
                 case .Plain:
+                    game.fail_count += 1 
+                    if !game.mercy_tipped && game.fail_count >= 2 {
+                        game.mercy_tipped = true;
+                        arrange_puzzle()
+                        set_feed(get_puzzle_requirements_feed())
+                    }
                     talk_resp_eat_plain()
                 case .EatSelf:
                     talk_resp_eat_self()
+                case .TooFresh:
+                    talk_resp_eat_too_fresh()
+                case .Win:
+                    win_game()
+                    talk_win()
                 }
             }
         }
-
-        if cheat_mode && rl.IsKeyPressed(.P) {
-            puzzle_extension()
-        }
-
         // debug
         if cheat_mode && rl.IsMouseButtonPressed(.RIGHT) {
             talk_resp_eat_good()
@@ -161,9 +169,7 @@ game_update :: proc(delta: f32) {
     case .Finish_FailedToFindTarget:
     case .Finish_TargetLost:
     case .Finish_Succeed:
-        if rl.GetKeyPressed() != .KEY_NULL {
-            rl.CloseWindow()
-        }
+        game_end_update()
     }
 }
 

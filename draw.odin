@@ -10,6 +10,10 @@ import "core:fmt"
 import "core:strings"
 import rl "vendor:raylib"
 
+
+white_curtain_alpha : f32 = 0.0
+
+
 draw :: proc() {
     draw_scene()
 
@@ -34,9 +38,9 @@ draw :: proc() {
         draw_text_center(msg, 400, rl.RED, font_size=30)
     }
 
-    draw_feed_state(457)
+    if !the_end_of_the_world do draw_feed_state(457)
 
-    {// Puzzle texture
+    if !the_end_of_the_world {// Puzzle texture
         @static puzzle_texture_size :f32= 1.0
         if rl.IsTextureReady(puzzle_texture) {
             if !puzzle_texture_wait_for_click {
@@ -59,32 +63,41 @@ draw :: proc() {
         }
     }
 
-    if cheat_mode {
+    if !the_end_of_the_world && cheat_mode {
         cheat_msg := fmt.ctprintf(
-            "CHEATMODE\n-{}\nqr piece idx: {}", 
+            "CHEATMODE\n-{}\nqr piece idx: {}\nhas win: {}", 
             search_ctx_get_path(game.target_file),
             qr_piece_idx,
+            the_game_has_win,
         )
         draw_text(cheat_msg, {10, 10}, rl.GREEN, font_size=26)
     }
+
+    curtain_color :rl.Color= {255,255,255, cast(u8)(white_curtain_alpha * 255.0)}
+    rl.DrawRectangle(0,0, app_info.width, app_info.height, curtain_color)
 }
 
-
 draw_scene :: proc() {
-    rl.DrawTexture(TEX_BACKGROUND, 0, 0, rl.WHITE)
-    rl.DrawTexture(TEX_GHOST_PEACE, 0, 0, rl.WHITE)
+    if !the_end_of_the_world {
+        rl.DrawTexture(TEX_BACKGROUND, 0, 0, rl.WHITE)
+        rl.DrawTexture(TEX_GHOST_PEACE, 0, 0, rl.WHITE)
 
-    draw_emotion_wheel()
-    
-    rl.DrawTexture(TEX_SUPPORT_BACK, 0, 0, rl.WHITE)
-    t := time.duration_seconds(app_timer.game_time)
+        draw_emotion_wheel()
+        
+        rl.DrawTexture(TEX_SUPPORT_BACK, 0, 0, rl.WHITE)
+    }
 
-    jam_freq := 1.4 if last_eat.result == .Good else 2.5
-    jam_offset := -math.sin(jam_freq * t) * 12 - 15
+    {// Draw the jam.
+        t := time.duration_seconds(app_timer.game_time)
+        jam_freq := 1.4 if last_eat.result == .Good else 2.5
+        jam_offset := -math.sin(jam_freq * t) * 12 - 15
+        rl.DrawTexture(TEX_JAM, 0, cast(i32)jam_offset, rl.WHITE)
+    }
 
-    rl.DrawTexture(TEX_JAM, 0, cast(i32)jam_offset, rl.WHITE)
-    rl.DrawTexture(TEX_SUPPORT_FORE, 0, 0, rl.WHITE)
-    rl.DrawTexture(TEX_FRAME, 0, 0, rl.WHITE)
+    if !the_end_of_the_world {
+        rl.DrawTexture(TEX_SUPPORT_FORE, 0, 0, rl.WHITE)
+        rl.DrawTexture(TEX_FRAME, 0, 0, rl.WHITE)
+    }
 }
 
 emotion_value : f32 = 180

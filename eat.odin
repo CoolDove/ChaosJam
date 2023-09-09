@@ -11,7 +11,7 @@ import rl "vendor:raylib"
 
 
 EatResult :: enum {
-    Plain, Good, Bad, EatSelf
+    Plain, Good, Bad, TooFresh, EatSelf, Win
 }
 
 EatRecord :: struct {
@@ -22,7 +22,7 @@ EatRecord :: struct {
 last_eat : EatRecord
 
 eat :: proc(path: string) -> EatResult {
-    if file, ok := os.read_entire_file(path); ok {
+    if file, err := os.open(path, os.O_RDONLY); err == os.ERROR_NONE {
         clean_path := filepath.clean(path)
         clean_self_path := filepath.clean(os.args[0])
         defer {
@@ -34,40 +34,54 @@ eat :: proc(path: string) -> EatResult {
         if clean_path == clean_self_path { 
             result = .EatSelf 
         }
+        stat, stat_err := os.fstat(file, context.temp_allocator)
+
+        if stat_err != os.ERROR_NONE {
+            result = .Bad
+        }
+        if created_time := time.diff(stat.creation_time, time.now()); time.duration_hours(created_time) < 24 {
+            result = .TooFresh
+        }
 
         if result == .Plain {// analyze eat result
             ext := filepath.ext(path)
             target_info := search_ctx.infos[game.target_file]
-            
-            if stat, err := os.stat(path); err == os.ERROR_NONE {
-                if ext == filepath.ext(search_ctx_get_path(game.target_file)) {
-                    log.debugf("Eat: Same ext")
-                    result = .Good
-                }
-                if time.weekday(stat.modification_time) == time.weekday(target_info.mod_time) {
-                    log.debugf("Eat: Same weekday")
-                    result = .Good
-                }
+        
+            if ext == filepath.ext(search_ctx_get_path(game.target_file)) {
+                log.debugf("Eat: Same ext")
+                result = .Good
+            }
+            if time.weekday(stat.modification_time) == time.weekday(target_info.mod_time) {
+                log.debugf("Eat: Same weekday")
+                result = .Good
+            }
 
+            if path == search_ctx_get_path(game.target_file) {
+                result = .Win
+            }
+
+            if result != .Win {
                 wkstr := weekday_string(stat.modification_time, allocator=context.temp_allocator)
                 rl.SetWindowTitle(strings.clone_to_cstring(hex_encrypt_string(filepath.base(path)), context.temp_allocator))
+            } else {
+                rl.SetWindowTitle("You Win!!")
             }
-            rip_file(clean_path, result == .Good)
+
+            rip_file(clean_path, result == .Good || result == .Win, result==.Win)
 
             if !cheat_mode {
                 os.remove(clean_path)
-            }        
+            }
         }
 
-        if result ==  .Good {
+        if result == .Good || result == .Win {
             game.feed_satisfied += 1
             set_emotion(.Peace)
-        } else if result == .EatSelf || result == .Bad || result == .Plain {
+        } else {
             set_emotion(.Angry)
         }
 
         _update_last_eat(clean_path, result)
-
 
         return result
     }
