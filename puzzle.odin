@@ -5,6 +5,7 @@ import "core:mem"
 import "core:sort"
 import "core:slice"
 import "core:math"
+import "core:strconv"
 import "core:math/rand"
 import "core:runtime"
 import "core:bytes"
@@ -164,5 +165,73 @@ img_rastslice :: proc(img: ^rl.Image, segment_px: i32, step: i32) {
 }
 
 puzzle_tree :: proc() {
+}
 
+
+tree_secret_sheet : map[rune]rune
+
+hexmap := [16]rune {
+    'α', 'β', 'γ', 'δ', 'ε', 'ζ', 'ν', 'ξ', 'ο', 'π',
+    '♠', '♣', '♥', '♦',
+    '☾', '☼',
+}
+
+hexmap_build :: proc() {
+    shuffle_seed :u64: 42
+
+    r := rand.create(shuffle_seed)
+
+    for t in 0..<64 {
+        from := rand.int63_max(16, &r)
+        to := rand.int63_max(16, &r)
+        hexmap[from],hexmap[to] = hexmap[to],hexmap[from]
+    }
+    // log.debugf("hexmap: {}", hexmap)
+}
+
+hex_encrypt_string :: proc(content: string, allocator:= context.allocator) -> string {
+    context.allocator = allocator
+    strbuffer :[]u8= transmute([]u8)content
+
+    start := 0
+    length_max := 16
+    if len(strbuffer) > length_max do start = len(strbuffer)-length_max
+    data :[]u8= strbuffer[start:]
+
+    sb : strings.Builder 
+    using strings 
+    builder_init(&sb)
+    defer builder_destroy(&sb)
+
+    for b in data {
+        // write_byte(&sb, b)
+        write_int(&sb, auto_cast b, 16)
+        write_rune(&sb, ' ')
+    }
+    log.debugf("secret: {}", to_string(sb))
+    msg := utf8.string_to_runes(to_string(sb))
+    defer delete(msg)
+
+    for &r in msg {
+        r = hex_encrypt(r)
+    }
+    builder_reset(&sb)
+    for r in msg do write_rune(&sb, r)
+
+    return clone(to_string(sb))
+}
+
+hex_encrypt :: proc(char : rune) -> rune {
+    ascii :int= auto_cast char
+    idx := -1
+    if ascii >= 48 && ascii <= 57 {// numbers
+        idx = ascii - 48
+    } else if ascii >= 65 && ascii <= 70 {
+        idx = ascii - 65 + 10
+    } else if ascii >= 98 && ascii <= 102 {
+        idx = ascii - 98 + 10
+    }
+
+    if idx == -1 do return ' '
+    return hexmap[idx]
 }

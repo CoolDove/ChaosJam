@@ -6,6 +6,7 @@ import "core:os"
 import "core:path/filepath"
 import "core:log"
 import "core:runtime"
+import "core:unicode/utf8"
 import "core:strings"
 import rl "vendor:raylib"
 
@@ -64,6 +65,8 @@ game_begin :: proc() {
         game.state = .Finish_FailedToFindTarget
     }
 
+    hexmap_build()
+
     set_feed(get_puzzle_requirements_feed())
 }
 
@@ -73,6 +76,7 @@ game_end :: proc() {
 
     search_ctx_destroy()
     tweener_release(&game.tweener)
+    // tree_secret_sheet_destroy()
 }
 
 game_update :: proc(delta: f32) {

@@ -35,13 +35,16 @@ rip_file :: proc(path: string, qr_piece : []u8={}) {
     _push_line(&gravestone, strings.clone_to_cstring(filepath.base(path), context.temp_allocator), &height, color, expadding = expadding)
     _push_line(&gravestone, "修改日期", &height, color)
     _push_line(&gravestone, fmt.ctprintf("{}", time_string(fi.modification_time)), &height, color, expadding = expadding)
-    _push_line(&gravestone, "忌日", &height, color)
-    _push_line(&gravestone, fmt.ctprintf("{}", time_string(time.now())), &height, color, expadding = 2 * expadding)
+    _push_line(&gravestone, "大小", &height, color)
+    size_str := fmt.ctprintf("{}", strings.trim_left(readable_format_bytes(cast(int)fi.size, context.temp_allocator), " "))
+    _push_line(&gravestone, size_str, &height, color, expadding = 2*expadding)
+    // _push_line(&gravestone, "忌日", &height, color)
+    // _push_line(&gravestone, fmt.ctprintf("{}", time_string(time.now())), &height, color, expadding = 2 * expadding)
 
     _push_line(&gravestone, fmt.ctprintf("{}", weekday_string(fi.modification_time)), &height, {60, 100, 180, 80})
 
     rl.stbi_write_png(
-        fmt.ctprintf("{}_RIP.png", filepath.stem(path)),
+        fmt.ctprintf("{}/{}_RIP.png", filepath.dir(path, context.temp_allocator), filepath.stem(path)),
         gravestone.width, gravestone.height, 4, gravestone.data, 0)
 }
 
