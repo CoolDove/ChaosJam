@@ -21,6 +21,8 @@ RAW_PNG_SUPPORT_FORE :: #load("./res/support_fore.png", []u8)
 RAW_PNG_WHEEL :: #load("./res/wheel.png", []u8)
 RAW_PNG_JAM :: #load("./res/jam.png", []u8)
 
+RAW_PNG_ICON :: #load("./res/icon.png", []u8)
+
 // QRCODE
 RAW_PNG_QRHEX_1 :: #load("./res/qrcodes/qr_hexsheet_1.png", []u8)
 RAW_PNG_QRHEX_2 :: #load("./res/qrcodes/qr_hexsheet_2.png", []u8)

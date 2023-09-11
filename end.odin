@@ -54,7 +54,7 @@ game_end_update :: proc() {
 }
 
 thanks_for_playing :: proc() {
-    content :string: "BV1Qv4y1r791"
+    content :string: "ThanksForPlaying.txt"
     os.write_entire_file("./ThanksForPlaying.txt", transmute([]u8)content)
 }
 

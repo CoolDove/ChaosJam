@@ -1,1 +1,1 @@
-odin build . -subsystem:windows
+odin build . -subsystem:windows -resource:app.rc

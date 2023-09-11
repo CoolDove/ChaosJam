@@ -49,6 +49,10 @@ game : Game
 
 game_begin :: proc() {
     cheat_mode = INIT_CHEAT_MODE
+
+    icon_img := rl.LoadImageFromMemory(".png", raw_data(RAW_PNG_ICON), auto_cast len(RAW_PNG_ICON))
+    defer rl.UnloadImage(icon_img)
+    rl.SetWindowIcon(icon_img)
     
     tweener_init(&game.tweener, 10)
     load_resources()
@@ -106,10 +110,11 @@ game_update :: proc(delta: f32) {
     case .Talk:
         if _talk_update(delta) {
             rl.UnloadDroppedFiles(rl.LoadDroppedFiles())
-            if reset_feed != -1 {
+            if reset_feed_flag {
                 game.feed_requirement = reset_feed
                 game.feed_satisfied = 0
                 reset_feed = -1
+                reset_feed_flag = false
             }
             if game.puzzle_arranged {
                 game.state = .Puzzle
@@ -120,10 +125,20 @@ game_update :: proc(delta: f32) {
             }
         }
     case .WaitForDrop:
-        if !puzzle_texture_wait_for_click && rl.IsFileDropped() {
+        cheat_drop := false
+        cheat_drop_file : string
+        if cheat_mode && rl.IsMouseButtonPressed(.LEFT) && last_eat.result == .Good {
+            cheat_drop = true
+            cheat_drop_file = strings.to_string(last_eat.path)
+        }
+        if !puzzle_texture_wait_for_click && (rl.IsFileDropped() || cheat_drop) {
             filepath_list := rl.LoadDroppedFiles()
             defer rl.UnloadDroppedFiles(filepath_list)
-            path := filepath_list.paths[0]
+            path :cstring
+
+            if cheat_drop do path = strings.clone_to_cstring(cheat_drop_file, context.temp_allocator)
+            else do path = filepath_list.paths[0]
+
             if os.is_file(cast(string)path) {
                 result := eat(cast(string)path)
                 switch result {
@@ -132,7 +147,6 @@ game_update :: proc(delta: f32) {
                 case .Good:
                     if game.feed_satisfied >= game.feed_requirement {
                         arrange_puzzle()
-                        set_feed(get_puzzle_requirements_feed())
                     }
                     talk_resp_eat_good()
                 case .Plain:
@@ -140,7 +154,6 @@ game_update :: proc(delta: f32) {
                     if !game.mercy_tipped && game.fail_count >= 2 {
                         game.mercy_tipped = true;
                         arrange_puzzle()
-                        set_feed(get_puzzle_requirements_feed())
                     }
                     talk_resp_eat_plain()
                 case .EatSelf:
@@ -154,9 +167,6 @@ game_update :: proc(delta: f32) {
             }
         }
         // debug
-        if cheat_mode && rl.IsMouseButtonPressed(.RIGHT) {
-            talk_resp_eat_good()
-        }
     case .Puzzle:
         if puzzle() {
             talk_puzzle()
@@ -174,9 +184,12 @@ game_update :: proc(delta: f32) {
 }
 
 reset_feed : i32
+reset_feed_flag : bool
+
 
 set_feed :: proc(require: i32) {
     reset_feed = require
+    reset_feed_flag = true
 }
 
 arrange_puzzle :: proc() {
