@@ -77,10 +77,19 @@ draw :: proc() {
     rl.DrawRectangle(0,0, app_info.width, app_info.height, curtain_color)
 }
 
+
 draw_scene :: proc() {
     if !the_end_of_the_world {
         rl.DrawTexture(TEX_BACKGROUND, 0, 0, rl.WHITE)
-        rl.DrawTexture(TEX_GHOST_PEACE, 0, 0, rl.WHITE)
+        ghost : ^rl.Texture2D
+        {// Find ghost texture
+            ghost = &TEX_GHOST_PEACE
+            if game.state == .Talk && strings.builder_len(last_eat.path) != 0 {
+                good := last_eat.result == .Good || last_eat.result == .Win
+                ghost = &TEX_GHOST_HAPPY if good else &TEX_GHOST_ANGRY
+            }
+        }
+        rl.DrawTexture(ghost^, 0, 0, rl.WHITE)
 
         draw_emotion_wheel()
         

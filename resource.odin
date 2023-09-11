@@ -15,6 +15,7 @@ RAW_PNG_STAR_OFF :: #load("./res/star_off.png", []u8)
 RAW_PNG_BACKGROUND :: #load("./res/background.png", []u8)
 RAW_PNG_GHOST_PEACE :: #load("./res/ghost_peace.png", []u8)
 RAW_PNG_GHOST_ANGRY :: #load("./res/ghost_angry.png", []u8)
+RAW_PNG_GHOST_HAPPY :: #load("./res/ghost_happy.png", []u8)
 RAW_PNG_FRAME :: #load("./res/frame.png", []u8)
 RAW_PNG_SUPPORT_BACK :: #load("./res/support_back.png", []u8)
 RAW_PNG_SUPPORT_FORE :: #load("./res/support_fore.png", []u8)
@@ -62,6 +63,7 @@ TEX_STAR_OFF : rl.Texture2D
 TEX_BACKGROUND : rl.Texture2D
 TEX_GHOST_PEACE : rl.Texture2D
 TEX_GHOST_ANGRY : rl.Texture2D
+TEX_GHOST_HAPPY : rl.Texture2D
 TEX_FRAME : rl.Texture2D
 TEX_SUPPORT_BACK : rl.Texture2D
 TEX_SUPPORT_FORE : rl.Texture2D
@@ -80,6 +82,7 @@ load_resources :: proc() {
     TEX_BACKGROUND = _load_texture(RAW_PNG_BACKGROUND)
     TEX_GHOST_PEACE = _load_texture(RAW_PNG_GHOST_PEACE)
     TEX_GHOST_ANGRY = _load_texture(RAW_PNG_GHOST_ANGRY)
+    TEX_GHOST_HAPPY = _load_texture(RAW_PNG_GHOST_HAPPY)
     TEX_FRAME = _load_texture(RAW_PNG_FRAME)
     TEX_SUPPORT_BACK = _load_texture(RAW_PNG_SUPPORT_BACK)
     TEX_SUPPORT_FORE = _load_texture(RAW_PNG_SUPPORT_FORE)
@@ -109,6 +112,7 @@ release_resources :: proc() {
     rl.UnloadTexture(TEX_BACKGROUND)
     rl.UnloadTexture(TEX_GHOST_PEACE)
     rl.UnloadTexture(TEX_GHOST_ANGRY)
+    rl.UnloadTexture(TEX_GHOST_HAPPY)
     rl.UnloadTexture(TEX_FRAME)
     rl.UnloadTexture(TEX_SUPPORT_BACK)
     rl.UnloadTexture(TEX_SUPPORT_FORE)
